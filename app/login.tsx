@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Dimensions, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     zIndex: 2,
-    marginBottom: -screenHeight * 0.1,
+    marginBottom: - 40,
   },
   catImage: {
     width: 150,
@@ -97,8 +97,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 25,
-    paddingTop: screenHeight * 0.12,
-    paddingBottom: 40,
+    paddingTop: screenHeight * 0.1,
+    paddingBottom: 80,
     alignItems: 'center',
     zIndex: 2,
   },

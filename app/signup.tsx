@@ -1,12 +1,35 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Dimensions, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const screenHeight = Dimensions.get('window').height;
 
 export default function SignUpPage() {
   const router = useRouter();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSignUp = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email }),
+      });
+      if (!response.ok) throw new Error('Signup failed');
+      // You can handle navigation or success feedback here
+      alert('Signup successful!');
+      // router.push('/login'); // Optionally navigate
+    } catch (err) {
+      alert('Signup failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -32,6 +55,8 @@ export default function SignUpPage() {
             style={styles.input}
             placeholder="Olivia Wilson"
             placeholderTextColor="#888"
+            value={name}
+            onChangeText={setName}
           />
         </View>
 
@@ -42,6 +67,8 @@ export default function SignUpPage() {
             placeholder="hello@reallygreatsite.com"
             placeholderTextColor="#888"
             keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
 
@@ -52,11 +79,13 @@ export default function SignUpPage() {
             placeholder="••••••"
             placeholderTextColor="#888"
             secureTextEntry
+            value={password}
+            onChangeText={setPassword}
           />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/signup')}>
-          <Text style={styles.buttonText}>Next</Text>
+        <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? 'Signing Up...' : 'Next'}</Text>
         </TouchableOpacity>
 
         <View style={styles.footer}>
