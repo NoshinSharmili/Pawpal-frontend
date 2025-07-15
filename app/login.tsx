@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Dimensions, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Dimensions } from 'react-native';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -8,104 +8,141 @@ export default function LoginPage() {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.welcomeText}>Welcome to</Text>
-      <Image
-          source={require('@/assets/images/logo.png')}
-          style={styles.imageLogo}
-          resizeMode="contain"
-        />
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {/* Top Heading */}
+      <Text style={styles.welcomeText}>Sign in to continue</Text>
 
-      {/* Positioned Cat Image */}
-      <View style={styles.imageWrapper}>
+      {/* Logo */}
+      <Image
+        source={require('@/assets/images/logo.png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+
+      {/* Cat image overlapping card */}
+      <View style={styles.catWrapper}>
         <Image
           source={require('@/assets/images/cat.png')}
-          style={styles.image}
+          style={styles.catImage}
           resizeMode="contain"
         />
       </View>
 
-      {/* Login/Sign Up Card */}
-      <View style={styles.buttonContainer}>
-        <Text style={styles.title}>Login</Text>
-      <TextInput placeholder="Email" style={styles.input} keyboardType="email-address" />
-      <TextInput placeholder="Password" style={styles.input} secureTextEntry />
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Log In</Text>
-      </TouchableOpacity>
+      {/* Login Form Card */}
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Log in</Text>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            placeholder="hello@reallygreatsite.com"
+            placeholderTextColor="#888"
+            style={styles.input}
+            keyboardType="email-address"
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            placeholder="••••••"
+            placeholderTextColor="#888"
+            style={styles.input}
+            secureTextEntry
+          />
+        </View>
+
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity>
+          <Text style={styles.forgotPassword}>Forgot Password?</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollContainer: {
+    flexGrow: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    paddingTop: 80,
   },
   welcomeText: {
-    fontSize: 18,
-    marginBottom: 5,
-    fontWeight:'bold'
+    fontSize: 14,
+    color: '#555',
+    marginTop: 30,
+    marginBottom: 8,
   },
-  logoText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#C74C58',
-    marginBottom: 20,
+  logo: {
+    width: 130,
+    height: 60,
+    marginBottom: 0,
   },
-  title: {
-    fontSize: 28,
-    textAlign: 'center',
-    marginBottom: 40,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#C74C58',
-    borderRadius: 20,
-    padding: 12,
-    marginBottom: 20,
-    backgroundColor: '#FFFFFF'
-  },
-  imageWrapper: {
-    zIndex: 1,
-    position: 'relative',
-    marginBottom: -screenHeight * 0.34, // pushes the image down
-  },
-  image: {
-    width: 180,
-    height: 180,
-  },
-  imageLogo: {
-    width: 180,
-    height: 100,
-    marginBottom: 10
-  },
-  buttonContainer: {
-    zIndex: 2,
-    backgroundColor: '#d16d78',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    padding: 25,
+  catWrapper: {
     width: '100%',
     alignItems: 'center',
-    paddingTop: screenHeight * 0.05, // creates the visual padding above buttons
-    paddingBottom: screenHeight * 0.15, // creates the visual padding above buttons
+    zIndex: 2,
+    marginBottom: -screenHeight * 0.1,
+  },
+  catImage: {
+    width: 150,
+    height: 150,
+  },
+  formContainer: {
+    backgroundColor: '#d16d78',
+    width: '100%',
+    maxWidth: 400,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 25,
+    paddingTop: screenHeight * 0.12,
+    paddingBottom: 40,
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 24,
+  },
+  inputGroup: {
+    width: '100%',
+    marginBottom: 16,
+  },
+  label: {
+    color: '#fff',
+    fontSize: 14,
+    marginBottom: 6,
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderRadius: 999,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: '#333',
   },
   button: {
-    borderWidth: 2,
-    borderColor: '#fff',
-    borderRadius: 25,
+    backgroundColor: '#fff',
+    borderRadius: 999,
     paddingVertical: 10,
-    paddingHorizontal: 60,
-    marginVertical: 10,
+    paddingHorizontal: 30,
+    marginTop: 10,
+    alignItems: 'center',
   },
   buttonText: {
+    color: '#d16d78',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  forgotPassword: {
+    marginTop: 14,
+    fontSize: 13,
     color: '#fff',
-    fontSize: 18,
+    textDecorationLine: 'underline',
   },
 });
+
