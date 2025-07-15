@@ -1,15 +1,15 @@
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  FlatList,
+    FlatList,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const categories = [
   { id: '1', label: 'Cat', icon: require('@/assets/images/catto1.png') },

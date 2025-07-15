@@ -24,7 +24,7 @@ export default function CreatePetPage() {
   });
 
   if (!result.canceled && result.assets.length > 0) {
-    setImage(result.assets[0].uri);  // ✅ string | null works
+    setImage(result.assets[0].uri);  
   }
 };
 
