@@ -13,6 +13,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
+    console.log("name, email, password");
     setLoading(true);
     try {
       const response = await fetch('http://localhost:5000/api/users', {
