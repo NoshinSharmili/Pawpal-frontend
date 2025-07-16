@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Alert, Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { UserContext } from '../context/UserContext';
+import { useUser } from '../context/UserContext';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -9,8 +9,8 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const { setUserId } = useContext(UserContext);
-
+  const { setUserId } = useUser();
+  
   const handleLogin = async () => {
     
     setLoading(true);
@@ -24,11 +24,10 @@ export default function LoginPage() {
       if (!response.ok) throw new Error('Login failed');
       const data = await response.json();
       if (!data.userId) throw new Error('No userId returned');
-      console.log("email");
       
       
       setUserId(data.userId);
-      router.push('/homepage');
+      router.replace('/homepage');
     } catch (err) {
       Alert.alert('Login failed', 'Please check your email and try again.');
     } finally {

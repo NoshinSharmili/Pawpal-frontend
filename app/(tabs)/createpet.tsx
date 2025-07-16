@@ -1,8 +1,8 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Alert, Dimensions, Image, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { UserContext } from '../../context/UserContext';
+import { useUser } from '../../context/UserContext';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -20,8 +20,8 @@ export default function CreatePetPage() {
   const [transferredFood, setTransferredFood] = useState(false);
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
-  const { userId } = useContext(UserContext);
-
+  const { userId } = useUser();
+  console.log(userId);
   const router = useRouter();
 
   const pickImage = async () => {

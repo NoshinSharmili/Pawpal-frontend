@@ -1,15 +1,16 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  FlatList,
-} from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+  FlatList,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 const categories = [
   { id: '1', label: 'Cat', icon: require('@/assets/images/catto1.png') },
@@ -17,24 +18,47 @@ const categories = [
   { id: '3', label: 'Rabbit', icon: require('@/assets/images/rabit.png') },
 ];
 
-const pets = [
-  {
-    id: '1',
-    name: 'Olivia',
-    gender: 'Female',
-    age: '2 years',
-    image: require('@/assets/images/cat1.png'),
-  },
-  {
-    id: '2',
-    name: 'Pedro',
-    gender: 'Male',
-    age: '3 years',
-    image: require('@/assets/images/dog1.png'),
-  },
-];
+const placeholderImage = require('@/assets/images/cat.png'); // Use any placeholder image you have
 
 export default function HomePage() {
+  const [pets, setPets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPets = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('http://localhost:5000/api/pets/');
+        if (!response.ok) throw new Error('Failed to fetch pets');
+        const data = await response.json();
+        setPets(data);
+      } catch (err) {
+        setPets([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPets();
+    console.log(pets);
+  }, []);
+
+  const renderPetCard = ({ item }: { item: any }) => (
+    <TouchableOpacity style={styles.petCard} onPress={() => { router.push({ pathname: '/PetProfileScreen/[petId]', params: { petId: item._id } });}}>
+      <Image source={placeholderImage} style={styles.petImage} />
+      <View style={styles.petInfo}>
+        <Text style={styles.petName}>{item.name}</Text>
+        <Text style={styles.petDetails}>{item.breed || ''}{item.gender ? `, ${item.gender}` : ''}{item.age ? `, ${item.age}` : ''}</Text>
+        <View style={styles.locationRow}>
+          <Ionicons name="location-sharp" size={12} color="#888" />
+          <Text style={styles.locationText}>{item.location || 'Unknown Location'}</Text>
+        </View>
+      </View>
+      <TouchableOpacity style={styles.heartIcon}>
+        <MaterialCommunityIcons name="heart-outline" size={20} color="#d16d78" />
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
@@ -84,31 +108,18 @@ export default function HomePage() {
       </View>
 
       {/* Pet Cards */}
-      <FlatList
-        data={pets}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        scrollEnabled={false}
-        columnWrapperStyle={styles.petRow}
-        renderItem={({ item }) => (
-          <View style={styles.petCard}>
-            <Image source={item.image} style={styles.petImage} />
-            <View style={styles.petInfo}>
-              <Text style={styles.petName}>{item.name}</Text>
-              <Text style={styles.petDetails}>
-                {item.gender}, {item.age}
-              </Text>
-              <View style={styles.locationRow}>
-                <Ionicons name="location-sharp" size={12} color="#888" />
-                <Text style={styles.locationText}>123 Anywhere St., Any City</Text>
-              </View>
-            </View>
-            <TouchableOpacity style={styles.heartIcon}>
-              <MaterialCommunityIcons name="heart-outline" size={20} color="#d16d78" />
-            </TouchableOpacity>
-          </View>
-        )}
-      />
+      {loading ? (
+        <Text style={{ textAlign: 'center', marginTop: 20 }}>Loading pets...</Text>
+      ) : (
+        <FlatList
+          data={pets}
+          keyExtractor={(item, index) => item.id ? String(item.id) : String(index)}
+          numColumns={2}
+          scrollEnabled={false}
+          columnWrapperStyle={styles.petRow}
+          renderItem={renderPetCard}
+        />
+      )}
     </ScrollView>
   );
 }
