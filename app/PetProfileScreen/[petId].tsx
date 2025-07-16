@@ -67,7 +67,7 @@ export default function PetProfileScreen() {
       </View>
 
       
-      <TouchableOpacity style={[styles.button, { backgroundColor: '#4CAF50', marginTop: 10 }]} onPress={() => router.push({ pathname: '/adoptionform', params: { petId: pet.id } })}>
+      <TouchableOpacity style={[styles.button, { backgroundColor: '#4CAF50', marginTop: 10 }]} onPress={() => { router.push({ pathname: '/adoptionform', params: { petId: petId } }); }}>
         <Text style={styles.buttonText}>Adopt Me</Text>
       </TouchableOpacity>
     </ScrollView>
