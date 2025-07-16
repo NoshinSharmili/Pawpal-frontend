@@ -1,24 +1,51 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Dimensions, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
+import React, { useContext, useState } from 'react';
+import { Alert, Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { UserContext } from '../context/UserContext';
 
 const screenHeight = Dimensions.get('window').height;
 
 export default function LoginPage() {
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { setUserId } = useContext(UserContext);
+
+  const handleLogin = async () => {
+    
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      
+      if (!response.ok) throw new Error('Login failed');
+      const data = await response.json();
+      if (!data.userId) throw new Error('No userId returned');
+      console.log("email");
+      
+      
+      setUserId(data.userId);
+      router.push('/homepage');
+    } catch (err) {
+      Alert.alert('Login failed', 'Please check your email and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       {/* Top Heading */}
       <Text style={styles.welcomeText}>Sign in to continue</Text>
-
       {/* Logo */}
       <Image
         source={require('@/assets/images/logo.png')}
         style={styles.logo}
         resizeMode="contain"
       />
-
       {/* Cat image overlapping card */}
       <View style={styles.catWrapper}>
         <Image
@@ -27,11 +54,9 @@ export default function LoginPage() {
           resizeMode="contain"
         />
       </View>
-
       {/* Login Form Card */}
       <View style={styles.formContainer}>
         <Text style={styles.title}>Log in</Text>
-
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -39,9 +64,11 @@ export default function LoginPage() {
             placeholderTextColor="#888"
             style={styles.input}
             keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
           />
         </View>
-
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Password</Text>
           <TextInput
@@ -49,13 +76,12 @@ export default function LoginPage() {
             placeholderTextColor="#888"
             style={styles.input}
             secureTextEntry
+            editable={false}
           />
         </View>
-
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Login</Text>
+        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
         </TouchableOpacity>
-
         <TouchableOpacity>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>
@@ -84,7 +110,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     zIndex: 2,
-    marginBottom: -screenHeight * 0.1,
+    marginBottom: - 40,
   },
   catImage: {
     width: 150,
@@ -97,8 +123,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 25,
-    paddingTop: screenHeight * 0.12,
-    paddingBottom: 40,
+    paddingTop: screenHeight * 0.1,
+    paddingBottom: 80,
     alignItems: 'center',
     zIndex: 2,
   },
