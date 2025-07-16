@@ -79,7 +79,9 @@ export default function HomePage() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <View style={{ width: 28 }} />
+        <TouchableOpacity onPress={() => router.push('/UserProfileScreen')}>
+          <Ionicons name="person-circle" size={32} color="#d16d78" />
+        </TouchableOpacity>
       </View>
 
       {/* Search */}
