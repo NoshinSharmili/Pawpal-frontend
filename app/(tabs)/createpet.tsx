@@ -92,6 +92,7 @@ export default function CreatePetPage() {
       <TextInput style={styles.input} placeholder="Type (e.g., Cat, Dog)" value={type} onChangeText={setType} />
       <TextInput style={styles.input} placeholder="Breed" value={breed} onChangeText={setBreed} />
       <TextInput style={styles.input} placeholder="Date of Birth (YYYY-MM-DD)" value={dob} onChangeText={setDob} />
+      
       <TextInput style={styles.input} placeholder="Health Status" value={healthStatus} onChangeText={setHealthStatus} />
       <View style={styles.switchRow}>
         <Text style={styles.switchLabel}>Vaccinated?</Text>

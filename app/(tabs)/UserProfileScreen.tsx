@@ -44,9 +44,9 @@ export default function UserProfileScreen() {
   }, [userId]);
 
   const renderPet = (pet: Pet) => (
-    <View key={pet.id} style={styles.petCard}>
+    <View key={pet._id || pet.id} style={styles.petCard}>
       <Text style={styles.petName}>{pet.name} - {pet.breed}</Text>
-      <TouchableOpacity style={styles.viewButton}>
+      <TouchableOpacity style={styles.viewButton} onPress={() => router.push({ pathname: '/PetProfileScreen/[petId]', params: { petId: pet._id || pet.id } })}>
         <Text style={styles.viewButtonText}>View</Text>
       </TouchableOpacity>
     </View>

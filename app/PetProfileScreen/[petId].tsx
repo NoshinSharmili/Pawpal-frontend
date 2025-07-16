@@ -6,9 +6,9 @@ interface Pet {
   id: string;
   name: string;
   breed: string;
-  age: number;
-  vaccinationStatus: string;
-  healthCondition: string;
+  dob: string;
+  vaccinationStatus: boolean;
+  healthStatus: string;
   notes?: string;
   // Add any other fields you expect from the API
 }
@@ -18,7 +18,18 @@ export default function PetProfileScreen() {
   console.log(petId);
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
+  const dobTruncate = (dob: string | undefined) => {
+    return dob?.split('T')[0] || 'Unknown DOB';
+  }
+  const ageFromDob = (dob: string | undefined) => {
+    if (!dob) return 'Unknown Age';
+    const dobDate = new Date(dob);
+    const today = new Date();
+    const age = today.getFullYear() - dobDate.getFullYear();
+    return age;
+  }
 
+  
   useEffect(() => {
     const fetchPet = async () => {
       setLoading(true);
@@ -50,13 +61,16 @@ export default function PetProfileScreen() {
         <Text style={styles.value}>{pet.breed}</Text>
 
         <Text style={styles.label}>Age:</Text>
-        <Text style={styles.value}>{pet.age} years</Text>
+        <Text style={styles.value}>{ageFromDob(pet.dob)} years</Text>
+
+        <Text style={styles.label}>Date of Birth:</Text>
+        <Text style={styles.value}>{dobTruncate(pet.dob)}</Text>
 
         <Text style={styles.label}>Vaccination Status:</Text>
-        <Text style={styles.value}>{pet.vaccinationStatus}</Text>
+        <Text style={styles.value}>{pet.vaccinationStatus ? 'Yes' : 'No'}</Text>
 
         <Text style={styles.label}>Health Condition:</Text>
-        <Text style={styles.value}>{pet.healthCondition}</Text>
+        <Text style={styles.value}>{pet.healthStatus}</Text>
 
         {pet.notes && (
           <>
@@ -67,7 +81,7 @@ export default function PetProfileScreen() {
       </View>
 
       
-      <TouchableOpacity style={[styles.button, { backgroundColor: '#4CAF50', marginTop: 10 }]} onPress={() => { router.push({ pathname: '/adoptionform', params: { petId: petId } }); }}>
+      <TouchableOpacity style={[styles.button, { backgroundColor: '#d16d78', marginTop: 10 }]} onPress={() => { router.push({ pathname: '/adoptionform', params: { petId: petId } }); }}>
         <Text style={styles.buttonText}>Adopt Me</Text>
       </TouchableOpacity>
     </ScrollView>

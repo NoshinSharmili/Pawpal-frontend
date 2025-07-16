@@ -23,6 +23,16 @@ const placeholderImage = require('@/assets/images/cat.png'); // Use any placehol
 export default function HomePage() {
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const dobTruncate = (dob: string | undefined) => {
+    return dob?.split('T')[0] || 'Unknown DOB';
+  }
+  const ageFromDob = (dob: string | undefined) => {
+    if (!dob) return 'Unknown Age';
+    const dobDate = new Date(dob);
+    const today = new Date();
+    const age = today.getFullYear() - dobDate.getFullYear();
+    return age;
+  }
 
   useEffect(() => {
     const fetchPets = async () => {
@@ -49,8 +59,8 @@ export default function HomePage() {
         <Text style={styles.petName}>{item.name}</Text>
         <Text style={styles.petDetails}>{item.breed || ''}{item.gender ? `, ${item.gender}` : ''}{item.age ? `, ${item.age}` : ''}</Text>
         <View style={styles.locationRow}>
-          <Ionicons name="location-sharp" size={12} color="#888" />
-          <Text style={styles.locationText}>{item.location || 'Unknown Location'}</Text>
+          <Ionicons name="calendar-outline" size={12} color="#888" />
+          <Text style={styles.locationText}>{ageFromDob(item.dob)} years</Text>
         </View>
       </View>
       <TouchableOpacity style={styles.heartIcon}>
