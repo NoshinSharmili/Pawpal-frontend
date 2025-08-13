@@ -170,7 +170,14 @@ export default function HomePage() {
             // or create the VetScreen component first
           }}
         >
-          <Text style={styles.seekHelpButtonText}>Seek Help</Text>
+          <TouchableOpacity 
+  style={styles.seekHelpButton}
+  onPress={() => {
+    router.push('/VetFinderScreen'); // Navigate to VetFinderScreen
+  }}
+>
+  <Text style={styles.seekHelpButtonText}>Seek Help</Text>
+</TouchableOpacity>
         </TouchableOpacity>
       </View>
 
@@ -339,13 +346,13 @@ const styles = StyleSheet.create({
       height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowRadius: 100,
     elevation: 3,
   },
   seekHelpButtonText: {
     color: '#C74C58',
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 17,
   },
   categoryHeader: {
     flexDirection: 'row',

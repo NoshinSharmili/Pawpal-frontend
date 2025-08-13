@@ -18,9 +18,11 @@ export default function PetProfileScreen() {
   console.log(petId);
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
+  
   const dobTruncate = (dob: string | undefined) => {
     return dob?.split('T')[0] || 'Unknown DOB';
   }
+  
   const ageFromDob = (dob: string | undefined) => {
     if (!dob) return 'Unknown Age';
     const dobDate = new Date(dob);
@@ -29,7 +31,6 @@ export default function PetProfileScreen() {
     return age;
   }
 
-  
   useEffect(() => {
     const fetchPet = async () => {
       setLoading(true);
@@ -80,10 +81,41 @@ export default function PetProfileScreen() {
         )}
       </View>
 
-      
-      <TouchableOpacity style={[styles.button, { backgroundColor: '#d16d78', marginTop: 10 }]} onPress={() => { router.push({ pathname: '/adoptionform', params: { petId: petId } }); }}>
-        <Text style={styles.buttonText}>Adopt Me</Text>
-      </TouchableOpacity>
+      {/* Action Buttons Container */}
+      <View style={styles.buttonContainer}>
+        {/* Adopt Me Button */}
+        <TouchableOpacity 
+          style={[styles.button, styles.adoptButton]} 
+          onPress={() => { 
+            router.push({ pathname: '/adoptionform', params: { petId: petId } }); 
+          }}
+        >
+          <Text style={styles.buttonText}>Adopt Me</Text>
+        </TouchableOpacity>
+
+        {/* Foster Care Button */}
+        <TouchableOpacity 
+          style={[styles.button, styles.fosterButton]} 
+          onPress={() => { 
+            router.push({ pathname: '/fostercareform', params: { petId: petId } }); 
+          }}
+        >
+          <Text style={styles.buttonText}>Request Foster Care</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Register as Foster Section */}
+      <View style={styles.fosterSection}>
+        <Text style={styles.fosterSectionTitle}>Want to help pets in need?</Text>
+        <TouchableOpacity 
+          style={[styles.button, styles.registerFosterButton]} 
+          onPress={() => { 
+            router.push('/registerfoster'); 
+          }}
+        >
+          <Text style={[styles.buttonText, styles.registerFosterText]}>Register as a Foster</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
@@ -126,19 +158,54 @@ const styles = StyleSheet.create({
     color: '#232323',
     marginBottom: 2,
   },
+  buttonContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
   button: {
-    backgroundColor: '#C74C58',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 40,
-    marginTop: 20,
+    marginTop: 10,
     width: '100%',
     alignItems: 'center',
     elevation: 2,
+  },
+  adoptButton: {
+    backgroundColor: '#C74C58',
+  },
+  fosterButton: {
+    backgroundColor: '#4CAF50', // Green color for foster care
+  },
+  registerFosterButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#C74C58',
+    elevation: 0,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 17,
   },
-}); 
+  registerFosterText: {
+    color: '#C74C58',
+  },
+  fosterSection: {
+    width: '100%',
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  fosterSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+});
