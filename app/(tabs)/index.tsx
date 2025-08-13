@@ -17,6 +17,8 @@ export default function LandingPage() {
         />
 
       {/* Positioned Cat Image */}
+      
+      {/* Positioned Cat Image */}
       <View style={styles.imageWrapper}>
         <Image
           source={require('@/assets/images/cat.png')}

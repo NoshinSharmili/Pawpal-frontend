@@ -20,8 +20,23 @@ const categories = [
 
 const placeholderImage = require('@/assets/images/cat.png'); // Use any placeholder image you have
 
+interface Pet {
+  _id: string;
+  id?: string;
+  name?: string;
+  breed?: string;
+  gender?: string;
+  color?: string;
+  location?: string;
+  age?: number;
+  dob?: string;
+  [key: string]: any; // For any additional properties
+}
+
 export default function HomePage() {
-  const [pets, setPets] = useState([]);
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [filteredPets, setFilteredPets] = useState<Pet[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const dobTruncate = (dob: string | undefined) => {
     return dob?.split('T')[0] || 'Unknown DOB';
@@ -42,8 +57,10 @@ export default function HomePage() {
         if (!response.ok) throw new Error('Failed to fetch pets');
         const data = await response.json();
         setPets(data);
+        setFilteredPets(data); // Initialize filtered pets with all pets
       } catch (err) {
         setPets([]);
+        setFilteredPets([]);
       } finally {
         setLoading(false);
       }
@@ -52,7 +69,37 @@ export default function HomePage() {
     console.log(pets);
   }, []);
 
-  const renderPetCard = ({ item }: { item: any }) => (
+  // Search functionality
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredPets(pets);
+    } else {
+      const filtered = pets.filter((pet: Pet) => {
+        const query = searchQuery.toLowerCase();
+        return (
+          pet.name?.toLowerCase().includes(query) ||
+          pet.breed?.toLowerCase().includes(query) ||
+          pet.gender?.toLowerCase().includes(query) ||
+          pet.color?.toLowerCase().includes(query) ||
+          pet.location?.toLowerCase().includes(query)
+        );
+      });
+      setFilteredPets(filtered);
+    }
+  }, [searchQuery, pets]);
+
+  const handleSearch = () => {
+    // This function can be used for additional search actions if needed
+    // The search is already handled by the useEffect above
+    console.log('Searching for:', searchQuery);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setFilteredPets(pets);
+  };
+
+  const renderPetCard = ({ item }: { item: Pet }) => (
     <TouchableOpacity style={styles.petCard} onPress={() => { router.push({ pathname: '/PetProfileScreen/[petId]', params: { petId: item._id } });}}>
       <Image source={placeholderImage} style={styles.petImage} />
       <View style={styles.petInfo}>
@@ -87,18 +134,43 @@ export default function HomePage() {
       {/* Search */}
       <View style={styles.searchBox}>
         <TextInput
-          placeholder="Search for pets"
+          placeholder="Search for pets by name, breed, color..."
           placeholderTextColor="#aaa"
           style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          returnKeyType="search"
+          onSubmitEditing={handleSearch}
         />
-        <Ionicons name="search" size={20} color="#d16d78" />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
+            <Ionicons name="close-circle" size={20} color="#999" />
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+          <Ionicons name="search" size={20} color="#d16d78" />
+        </TouchableOpacity>
       </View>
 
-      {/* Banner */}
+      {/* Vet Banner */}
       <View style={styles.banner}>
-        <Text style={styles.bannerText}>Pet Adoption{"\n"}Made Easy</Text>
-        <TouchableOpacity style={styles.adoptButton}>
-          <Text style={styles.adoptButtonText}>Adopt now</Text>
+        <View style={styles.bannerContent}>
+          <MaterialCommunityIcons name="stethoscope" size={24} color="#fff" style={styles.bannerIcon} />
+          <Text style={styles.bannerText}>Is your pet{"\n"}okay?</Text>
+        </View>
+        <TouchableOpacity 
+          style={styles.seekHelpButton}
+          onPress={() => {
+            // You can replace this with your actual vet screen route
+            // For now, using a placeholder action
+            console.log('Navigate to vet screen');
+            // Uncomment and replace with your actual route:
+            // router.push('/vet' as any); 
+            // or router.push('/VetScreen' as any);
+            // or create the VetScreen component first
+          }}
+        >
+          <Text style={styles.seekHelpButtonText}>Seek Help</Text>
         </TouchableOpacity>
       </View>
 
@@ -122,19 +194,44 @@ export default function HomePage() {
       {/* Pet Cards */}
       {loading ? (
         <Text style={{ textAlign: 'center', marginTop: 20 }}>Loading pets...</Text>
+      ) : filteredPets.length === 0 ? (
+        <View style={styles.noResultsContainer}>
+          <MaterialCommunityIcons name="magnify" size={48} color="#ccc" />
+          <Text style={styles.noResultsText}>
+            {searchQuery ? `No pets found for "${searchQuery}"` : 'No pets available'}
+          </Text>
+          {searchQuery && (
+            <TouchableOpacity onPress={clearSearch} style={styles.clearSearchButton}>
+              <Text style={styles.clearSearchText}>Clear Search</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       ) : (
-        <FlatList
-          data={pets}
-          keyExtractor={(item, index) => item.id ? String(item.id) : String(index)}
-          numColumns={2}
-          scrollEnabled={false}
-          columnWrapperStyle={styles.petRow}
-          renderItem={renderPetCard}
-        />
+        <>
+          {searchQuery && (
+            <View style={styles.searchResultsHeader}>
+              <Text style={styles.searchResultsText}>
+                Found {filteredPets.length} pet{filteredPets.length !== 1 ? 's' : ''} for "{searchQuery}"
+              </Text>
+              <TouchableOpacity onPress={clearSearch}>
+                <Text style={styles.clearSearchText}>Clear</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          <FlatList
+            data={filteredPets}
+            keyExtractor={(item, index) => item.id ? String(item.id) : String(index)}
+            numColumns={2}
+            scrollEnabled={false}
+            columnWrapperStyle={styles.petRow}
+            renderItem={renderPetCard}
+          />
+        </>
       )}
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -165,29 +262,90 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: '#333',
+    paddingRight: 8,
+  },
+  clearButton: {
+    marginRight: 8,
+  },
+  searchButton: {
+    padding: 4,
+  },
+  searchResultsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  searchResultsText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  clearSearchText: {
+    fontSize: 14,
+    color: '#d16d78',
+    fontWeight: '600',
+  },
+  clearSearchButton: {
+    backgroundColor: '#d16d78',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginTop: 12,
+  },
+  noResultsContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  noResultsText: {
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 12,
+    marginBottom: 8,
   },
   banner: {
-    backgroundColor: '#f1787e',
+    backgroundColor: '#d16d78',
     borderRadius: 16,
     padding: 20,
-    alignItems: 'flex-start',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 20,
+  },
+  bannerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  bannerIcon: {
+    marginRight: 12,
   },
   bannerText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 10,
   },
-  adoptButton: {
+  seekHelpButton: {
     backgroundColor: '#fff',
     borderRadius: 999,
     paddingHorizontal: 20,
-    paddingVertical: 6,
+    paddingVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  adoptButtonText: {
-    color: '#f1787e',
+  seekHelpButtonText: {
+    color: '#C74C58',
     fontWeight: '600',
+    fontSize: 14,
   },
   categoryHeader: {
     flexDirection: 'row',
