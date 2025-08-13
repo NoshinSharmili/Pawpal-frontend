@@ -24,6 +24,13 @@ export default function CreatePetPage() {
   console.log(userId);
   const router = useRouter();
 
+  const getFileNameAndType = (uri: string) => {
+    const fileName = uri.split('/').pop() || 'photo.jpg';
+    const match = /\.(\w+)$/.exec(fileName);
+    const fileType = match ? `image/${match[1]}` : 'image/jpeg';
+    return { fileName, fileType };
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -32,7 +39,33 @@ export default function CreatePetPage() {
       quality: 1,
     });
     if (!result.canceled && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
+      const asset = result.assets[0];
+      const { fileName, fileType } = getFileNameAndType(asset.uri);
+      try {
+        // 1. Get presigned URL
+        const presignRes = await fetch('http://localhost:5000/api/pets/presigned-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileName, fileType }),
+        });
+        if (!presignRes.ok) throw new Error('Failed to get presigned URL');
+        const { uploadURL, key } = await presignRes.json();
+        // 2. Upload image to S3
+        const img = await fetch(asset.uri);
+        const blob = await img.blob();
+        const uploadRes = await fetch(uploadURL, {
+          method: 'PUT',
+          headers: { 'Content-Type': fileType },
+          body: blob,
+        });
+        if (!uploadRes.ok) throw new Error('Failed to upload image');
+        // 3. Save the S3 image URL (public URL)
+        // You may need to adjust this URL based on your S3 bucket's public access pattern
+        const imageUrl = uploadURL.split('?')[0];
+        setImage(imageUrl);
+      } catch (err) {
+        Alert.alert('Error', 'Image upload failed.');
+      }
     }
   };
 
@@ -62,6 +95,7 @@ export default function CreatePetPage() {
         transferredFood,
         userId,
         location,
+        image, // <-- add image URL
       };
       const response = await fetch('http://localhost:5000/api/pets', {
         method: 'POST',

@@ -30,6 +30,7 @@ interface Pet {
   location?: string;
   age?: number;
   dob?: string;
+  image?: string; // Added image property
   [key: string]: any; // For any additional properties
 }
 
@@ -101,7 +102,7 @@ export default function HomePage() {
 
   const renderPetCard = ({ item }: { item: Pet }) => (
     <TouchableOpacity style={styles.petCard} onPress={() => { router.push({ pathname: '/PetProfileScreen/[petId]', params: { petId: item._id } });}}>
-      <Image source={placeholderImage} style={styles.petImage} />
+      <Image source={item.image ? { uri: item.image } : placeholderImage} style={styles.petImage} />
       <View style={styles.petInfo}>
         <Text style={styles.petName}>{item.name}</Text>
         <Text style={styles.petDetails}>{item.breed || ''}{item.gender ? `, ${item.gender}` : ''}{item.age ? `, ${item.age}` : ''}</Text>
