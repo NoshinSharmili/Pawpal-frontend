@@ -1,9 +1,11 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Pet {
-  id: string;
+  id?: string;
+  _id?: string;
   name: string;
   breed: string;
   dob: string;
@@ -53,6 +55,27 @@ export default function PetProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 4 }}>
+        <TouchableOpacity
+          onPress={async () => {
+            try {
+              setLoading(true);
+              const response = await fetch(`http://localhost:5000/api/pets/${pet._id || pet.id}`, {
+                method: 'DELETE',
+              });
+              if (!response.ok) throw new Error('Failed to delete pet');
+              router.push('/homepage');
+            } catch (err) {
+              setLoading(false);
+              alert('Failed to delete pet.');
+            }
+          }}
+          accessibilityLabel="Delete Pet"
+          style={{ padding: 8 }}
+        >
+          <Ionicons name="trash" size={28} color="#d9534f" />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.title}>Pet Profile</Text>
       <View style={styles.card}>
         <Text style={styles.label}>Name:</Text>
