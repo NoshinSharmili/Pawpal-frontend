@@ -112,7 +112,7 @@ export default function HomePage() {
         router.push('/RegisterFoster');
         break;
       case 'notifications':
-        router.push('/Notifications');
+        router.push('/notifications');
         break;
       default:
         break;
