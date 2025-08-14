@@ -127,18 +127,7 @@ export default function PetProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Register as Foster Section */}
-      <View style={styles.fosterSection}>
-        <Text style={styles.fosterSectionTitle}>Want to help pets in need?</Text>
-        <TouchableOpacity 
-          style={[styles.button, styles.registerFosterButton]} 
-          onPress={() => { 
-            router.push('/registerfoster'); 
-          }}
-        >
-          <Text style={[styles.buttonText, styles.registerFosterText]}>Register as a Foster</Text>
-        </TouchableOpacity>
-      </View>
+      
     </ScrollView>
   );
 }

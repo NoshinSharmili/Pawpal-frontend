@@ -69,6 +69,18 @@ export default function UserProfileScreen() {
       <TouchableOpacity style={styles.addButton} onPress={() => router.replace('/createpet')}>
         <Text style={styles.addButtonText}>Add New Pet</Text>
       </TouchableOpacity>
+      {/* Register as Foster Section */}
+      <View style={styles.fosterSection}>
+        <Text style={styles.fosterSectionTitle}>Want to help pets in need?</Text>
+        <TouchableOpacity 
+          style={[styles.button, styles.registerFosterButton]} 
+          onPress={() => { 
+            router.push('/registerfoster'); 
+          }}
+        >
+          <Text style={[styles.buttonText, styles.registerFosterText]}>Register as a Foster</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
@@ -150,5 +162,49 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 17,
+  },
+  button: {
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+    elevation: 2,
+  },
+  
+  fosterButton: {
+    backgroundColor: '#4CAF50', // Green color for foster care
+  },
+  registerFosterButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#C74C58',
+    elevation: 0,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 17,
+  },
+  registerFosterText: {
+    color: '#C74C58',
+  },
+  fosterSection: {
+    width: '100%',
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  fosterSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 10,
+    textAlign: 'center',
   },
 });
