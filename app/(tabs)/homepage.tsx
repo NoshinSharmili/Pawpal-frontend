@@ -39,6 +39,8 @@ export default function HomePage() {
   const [filteredPets, setFilteredPets] = useState<Pet[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  
+  const [showDropdown, setShowDropdown] = useState(false);
   const dobTruncate = (dob: string | undefined) => {
     return dob?.split('T')[0] || 'Unknown DOB';
   }
@@ -99,6 +101,23 @@ export default function HomePage() {
     setSearchQuery('');
     setFilteredPets(pets);
   };
+  
+  const handleDropdownOption = (option: string) => {
+    setShowDropdown(false);
+    switch (option) {
+      case 'profile':
+        router.push('/UserProfileScreen');
+        break;
+      case 'foster':
+        router.push('/RegisterFoster');
+        break;
+      case 'notifications':
+        router.push('/Notifications');
+        break;
+      default:
+        break;
+    }
+  };
 
   const renderPetCard = ({ item }: { item: Pet }) => (
     <TouchableOpacity style={styles.petCard} onPress={() => { router.push({ pathname: '/PetProfileScreen/[petId]', params: { petId: item._id } });}}>
@@ -127,11 +146,43 @@ export default function HomePage() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <TouchableOpacity onPress={() => router.push('/UserProfileScreen')}>
-          <Ionicons name="person-circle" size={32} color="#d16d78" />
-        </TouchableOpacity>
-      </View>
-
+      <View style={styles.profileContainer}>
+          <TouchableOpacity
+            onPress={() => setShowDropdown(!showDropdown)}
+            style={styles.profileButton}
+          >
+            <Ionicons name="person-circle" size={32} color="#f1787e" />
+          </TouchableOpacity>
+         
+          {showDropdown && (
+            <View style={styles.dropdown}>
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={() => handleDropdownOption('profile')}
+              >
+                <Ionicons name="person-outline" size={20} color="#f1787e" />
+                <Text style={styles.dropdownText}>Your Profile</Text>
+              </TouchableOpacity>
+             
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={() => handleDropdownOption('foster')}
+              >
+                <MaterialCommunityIcons name="heart-plus" size={20} color="#f1787e" />
+                <Text style={styles.dropdownText}>Register as Foster</Text>
+              </TouchableOpacity>
+             
+              <TouchableOpacity
+                style={[styles.dropdownItem, styles.lastDropdownItem]}
+                onPress={() => handleDropdownOption('notifications')}
+              >
+                <Ionicons name="notifications-outline" size={20} color="#f1787e" />
+                <Text style={styles.dropdownText}>Notifications</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+        </View>
       {/* Search */}
       <View style={styles.searchBox}>
         <TextInput
@@ -265,6 +316,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     marginBottom: 20,
+    zIndex: -1,
   },
   searchInput: {
     flex: 1,
@@ -315,13 +367,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   banner: {
-    backgroundColor: '#d16d78',
+    backgroundColor: '#f1787e', // Changed back to the original pink color
     borderRadius: 16,
     padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
+    zIndex: -1,
   },
   bannerContent: {
     flexDirection: 'row',
@@ -347,13 +400,13 @@ const styles = StyleSheet.create({
       height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 100,
+    shadowRadius: 3,
     elevation: 3,
   },
   seekHelpButtonText: {
-    color: '#C74C58',
+    color: '#f1787e', // Changed to match the pink banner color
     fontWeight: '600',
-    fontSize: 17,
+    fontSize: 14,
   },
   categoryHeader: {
     flexDirection: 'row',
@@ -434,5 +487,51 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 999,
     padding: 4,
+  },
+  profileContainer: {
+    position: 'relative',
+    zIndex: 1001,
+  },
+  profileButton: {
+    padding: 4,
+  },
+  dropdown: {
+    position: 'absolute',
+    top: 45,
+    right: -8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingVertical: 8,
+    minWidth: 200,
+    maxWidth: 220,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 15,
+    borderWidth: 1,
+    borderColor: '#e8e8e8',
+    zIndex: 9999,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f5f5f5',
+  },
+  lastDropdownItem: {
+    borderBottomWidth: 0,
+  },
+  dropdownText: {
+    marginLeft: 12,
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '500',
+    flex: 1,
   },
 });
