@@ -8,24 +8,31 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 // Type definitions
 interface VetLocation {
   coordinates: number[];
 }
 
-interface VetAddress {
-  fullAddress: string;
-}
+// interface VetAddress {
+//   street: string;
+//   city: string;
+//   state: string;
+//   zip: string;
+//   country: string;
+// }
 
 interface Vet {
   _id: string;
   name: string;
-  address: VetAddress;
+  address: string;
   services: string[];
   rating: number;
   reviewCount: number;
   phone: string;
+  latitude: number;
+  longitude: number;
   location: VetLocation;
 }
 
@@ -205,60 +212,33 @@ const styles = StyleSheet.create({
   },
 });
 
-// Dummy data with proper typing
-const dummyVets: Vet[] = [
-  {
-    _id: '1',
-    name: "Dhaka Veterinary Hospital",
-    address: {
-      fullAddress: "123 Gulshan Avenue, Gulshan, Dhaka 1212"
-    },
-    services: ["General Care", "Surgery", "Emergency"],
-    rating: 4.5,
-    reviewCount: 128,
-    phone: "+8801XXXXXXXXX",
-    location: {
-      coordinates: [90.4125, 23.7805]
-    }
-  },
-  {
-    _id: '2',
-    name: "Pet Care Center",
-    address: {
-      fullAddress: "456 Dhanmondi Road, Dhanmondi, Dhaka 1205"
-    },
-    services: ["Vaccination", "Dental", "Grooming"],
-    rating: 4.2,
-    reviewCount: 85,
-    phone: "+8801YYYYYYYYY",
-    location: {
-      coordinates: [90.3753, 23.7465]
-    }
-  },
-  {
-    _id: '3',
-    name: "Animal Health Clinic",
-    address: {
-      fullAddress: "789 Uttara Sector 3, Uttara, Dhaka 1230"
-    },
-    services: ["Emergency", "Surgery", "X-Ray"],
-    rating: 4.7,
-    reviewCount: 156,
-    phone: "+8801ZZZZZZZZZ",
-    location: {
-      coordinates: [90.3964, 23.8748]
-    }
-  }
-];
-
-const dummyUserLocation: UserLocation = {
-  latitude: 23.7805,
-  longitude: 90.4125
-};
+// Utility function to calculate distance between two coordinates (Haversine formula)
+function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Radius of the earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Distance in km
+  return d;
+}
 
 //VetListView Component with proper typing
 const VetListView: React.FC<VetListViewProps> = ({ vets, userLocation, navigation }) => {
   const renderVetItem = ({ item }: { item: Vet }) => {
+    // Calculate distance if userLocation and vet location are available
+    let distanceText = '';
+    if (userLocation) {
+      // Note: coordinates are [longitude, latitude]
+      const vetLat = item.latitude;
+      const vetLon = item.longitude;
+      console.log(vetLat, vetLon, userLocation.latitude, userLocation.longitude);
+      const dist = getDistanceFromLatLonInKm(userLocation.latitude, userLocation.longitude, vetLat, vetLon);
+      distanceText = `${dist.toFixed(1)} km away`;
+    }
     return (
       <TouchableOpacity 
         style={styles.vetCard}
@@ -266,7 +246,7 @@ const VetListView: React.FC<VetListViewProps> = ({ vets, userLocation, navigatio
       >
         <View style={styles.vetInfo}>
           <Text style={styles.vetName}>{item.name}</Text>
-          <Text style={styles.vetAddress}>{item.address.fullAddress}</Text>
+          <Text style={styles.vetAddress}>{item.address}</Text>
           
           <View style={styles.servicesContainer}>
             {item.services.slice(0, 3).map((service: string, index: number) => (
@@ -284,7 +264,7 @@ const VetListView: React.FC<VetListViewProps> = ({ vets, userLocation, navigatio
           <View style={styles.ratingRow}>
             <Text style={styles.rating}>⭐ {item.rating}</Text>
             <Text style={styles.reviewCount}>({item.reviewCount} reviews)</Text>
-            <Text style={styles.distance}>2.3 km away</Text>
+            <Text style={styles.distance}>{distanceText}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -309,14 +289,73 @@ const VetListView: React.FC<VetListViewProps> = ({ vets, userLocation, navigatio
 
 //VetMapView Component with proper typing
 const VetMapView: React.FC<VetMapViewProps> = ({ vets, userLocation, navigation }) => {
-  const vetCount: number = vets.length;
-  
+  if (!userLocation) {
+    return (
+      <View style={styles.mapPlaceholder}>
+        <Text style={styles.mapText}>🗺️</Text>
+        <Text style={styles.mapSubtext}>Map View</Text>
+        <Text style={styles.mapNote}>User location not available</Text>
+      </View>
+    );
+  }
+
+  // Prepare markers for vets and user
+  const allMarkers = [
+    // User marker (special color)
+    {
+      lat: userLocation.latitude,
+      lng: userLocation.longitude,
+      label: 'You',
+      color: 'blue',
+    },
+    // Vet markers
+    ...vets.filter(vet => vet.latitude && vet.longitude).map(vet => ({
+      lat: vet.latitude,
+      lng: vet.longitude,
+      label: vet.name,
+      color: 'red',
+    }))
+  ];
+
+  // HTML for Leaflet map
+  const leafletHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+      <style> #map { height: 100vh; width: 100vw; } html, body { margin: 0; padding: 0; height: 100%; } </style>
+    </head>
+    <body>
+      <div id="map"></div>
+      <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+      <script>
+        var map = L.map('map').setView([${userLocation.latitude}, ${userLocation.longitude}], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+        }).addTo(map);
+        var markers = ${JSON.stringify(allMarkers)};
+        markers.forEach(function(m) {
+          L.marker([m.lat, m.lng], {icon: L.icon({iconUrl: m.color === 'blue' ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png' : 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowUrl: 'https://unpkg.com/leaflet@1.8.0/dist/images/marker-shadow.png', shadowSize: [41, 41]})})
+            .addTo(map)
+            .bindPopup(m.label);
+        });
+      </script>
+    </body>
+    </html>
+  `;
+
   return (
-    <View style={styles.mapPlaceholder}>
-      <Text style={styles.mapText}>🗺️</Text>
-      <Text style={styles.mapSubtext}>Map View</Text>
-      <Text style={styles.mapNote}>Showing {vetCount} vets near you</Text>
-      <Text style={styles.mapNote}>Map integration coming soon...</Text>
+    <View style={{ flex: 1, margin: 15, borderRadius: 10, overflow: 'hidden' }}>
+      <WebView
+        originWhitelist={["*"]}
+        source={{ html: leafletHTML }}
+        style={{ flex: 1, borderRadius: 10 }}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        automaticallyAdjustContentInsets={false}
+        scrollEnabled={false}
+      />
     </View>
   );
 };
@@ -329,13 +368,35 @@ const VetFinderScreen: React.FC<VetFinderScreenProps> = ({ navigation }) => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   useEffect(() => {
-    // Simulate loading with dummy data
     setLoading(true);
-    setTimeout(() => {
-      setUserLocation(dummyUserLocation);
-      setVets(dummyVets);
-      setLoading(false);
-    }, 1500);
+    // Simulate user location (replace with real geolocation if available)
+    setUserLocation({ latitude: 23.7805, longitude: 90.4125 });
+    // Fetch vets from API
+    fetch('http://localhost:5000/api/vets')
+      .then((response) => response.json())
+      .then((data) => {
+        // Map API data to Vet[]
+        const mappedVets: Vet[] = data.map((vet: any) => ({
+          _id: vet._id,
+          name: vet.clinicName || vet.name,
+          address:  vet.address || 'No address provided' ,
+          services: vet.services || [],
+          rating: vet.rating || 4.0, // fallback if not present
+          reviewCount: vet.reviews ? vet.reviews.length : 0,
+          phone: vet.phone,
+          latitude: vet.latitude,
+          longitude: vet.longitude,
+          location: {
+            coordinates: vet.location?.coordinates || [0, 0],
+          },
+        }));
+        setVets(mappedVets);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        Alert.alert('Error', 'Failed to fetch vets');
+      });
   }, []);
 
   if (loading) {
