@@ -1,3 +1,4 @@
+import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -20,6 +21,7 @@ export default function CreatePetPage() {
   const [transferredFood, setTransferredFood] = useState(false);
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
+  const [categoryError, setCategoryError] = useState('');
   const { userId } = useUser();
   console.log(userId);
   const router = useRouter();
@@ -70,6 +72,11 @@ export default function CreatePetPage() {
   };
 
   const handleSubmit = async () => {
+    setCategoryError('');
+    if (!type) {
+      setCategoryError('Please select a pet category.');
+      return;
+    }
     console.log(name);
     // if (name === "") {
     //   Alert.alert('Validation', 'Pet name is required.');
@@ -123,7 +130,21 @@ export default function CreatePetPage() {
         )}
       </TouchableOpacity>
       <TextInput style={styles.input} placeholder="Pet Name*" value={name} onChangeText={setName} />
-      <TextInput style={styles.input} placeholder="Type (e.g., Cat, Dog)" value={type} onChangeText={setType} />
+      
+        <Picker
+          selectedValue={type}
+          onValueChange={(itemValue: string) => setType(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Select Category*" value="" />
+          <Picker.Item label="Cats" value="cats" />
+          <Picker.Item label="Dogs" value="dogs" />
+          <Picker.Item label="Rabbits" value="rabbits" />
+          <Picker.Item label="Birds" value="birds" />
+          <Picker.Item label="Others" value="others" />
+        </Picker>
+      
+      {categoryError ? <Text style={{ color: 'red', marginBottom: 10 }}>{categoryError}</Text> : null}
       <TextInput style={styles.input} placeholder="Breed" value={breed} onChangeText={setBreed} />
       <TextInput style={styles.input} placeholder="Date of Birth (YYYY-MM-DD)" value={dob} onChangeText={setDob} />
       
@@ -204,5 +225,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   switchRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, justifyContent: 'space-between', width: '100%' },
-  switchLabel: { fontSize: 14, color: '#333' }
+  switchLabel: { fontSize: 14, color: '#333' },
+  pickerContainer: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderColor: '#d16d78',
+    borderWidth: 1,
+    borderRadius: 25,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    justifyContent: 'center',
+  },
+  picker: {
+    width: '100%',
+    height: 44,
+    color: '#333',
+    backgroundColor: '#fff',
+    borderColor: '#d16d78',
+    borderWidth: 1,
+    borderRadius: 25,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    justifyContent: 'center',
+  },
 });

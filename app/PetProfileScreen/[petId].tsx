@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useUser } from '../../context/UserContext';
 
 interface Pet {
   id?: string;
@@ -17,9 +18,11 @@ interface Pet {
 
 export default function PetProfileScreen() {
   const { petId } = useLocalSearchParams();
+  const { userId } = useUser();
   console.log(petId);
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
+  const [adoptionLoading, setAdoptionLoading] = useState(false);
   
   const dobTruncate = (dob: string | undefined) => {
     return dob?.split('T')[0] || 'Unknown DOB';
@@ -53,28 +56,57 @@ export default function PetProfileScreen() {
   if (loading) return <Text>Loading...</Text>;
   if (!pet) return <Text>Pet not found.</Text>;
 
+  // Determine owner (support both ownerId and userId fields)
+  const ownerId = (pet as any).ownerId || (pet as any).userId;
+  const isOwner = userId && ownerId && userId === ownerId;
+  const adoptionStatus = (pet as any).adoptionStatus || (pet as any).status || 'personal';
+
+  // Handler to toggle adoption status
+  const handleToggleAdoptionStatus = async () => {
+    if (!pet || !pet._id && !pet.id) return;
+    setAdoptionLoading(true);
+    try {
+      const res = await fetch(`http://localhost:5000/api/pets/${pet._id || pet.id}/adoption-status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          adoptionStatus: adoptionStatus === 'personal' ? 'up for adoption' : 'personal',
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to update adoption status');
+      const updated = await res.json();
+      setPet(updated);
+    } catch (err) {
+      alert('Could not update adoption status.');
+    } finally {
+      setAdoptionLoading(false);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 4 }}>
-        <TouchableOpacity
-          onPress={async () => {
-            try {
-              setLoading(true);
-              const response = await fetch(`http://localhost:5000/api/pets/${pet._id || pet.id}`, {
-                method: 'DELETE',
-              });
-              if (!response.ok) throw new Error('Failed to delete pet');
-              router.push('/homepage');
-            } catch (err) {
-              setLoading(false);
-              alert('Failed to delete pet.');
-            }
-          }}
-          accessibilityLabel="Delete Pet"
-          style={{ padding: 8 }}
-        >
-          <Ionicons name="trash" size={28} color="#d9534f" />
-        </TouchableOpacity>
+        {isOwner && (
+          <TouchableOpacity
+            onPress={async () => {
+              try {
+                setLoading(true);
+                const response = await fetch(`http://localhost:5000/api/pets/${pet._id || pet.id}`, {
+                  method: 'DELETE',
+                });
+                if (!response.ok) throw new Error('Failed to delete pet');
+                router.push('/homepage');
+              } catch (err) {
+                setLoading(false);
+                alert('Failed to delete pet.');
+              }
+            }}
+            accessibilityLabel="Delete Pet"
+            style={{ padding: 8 }}
+          >
+            <Ionicons name="trash" size={28} color="#d9534f" />
+          </TouchableOpacity>
+        )}
       </View>
       <Text style={styles.title}>Pet Profile</Text>
       <View style={styles.card}>
@@ -106,25 +138,44 @@ export default function PetProfileScreen() {
 
       {/* Action Buttons Container */}
       <View style={styles.buttonContainer}>
-        {/* Adopt Me Button */}
-        <TouchableOpacity 
-          style={[styles.button, styles.adoptButton]} 
-          onPress={() => { 
-            router.push({ pathname: '/adoptionform', params: { petId: petId } }); 
-          }}
-        >
-          <Text style={styles.buttonText}>Adopt Me</Text>
-        </TouchableOpacity>
-
-        {/* Foster Care Button */}
-        <TouchableOpacity 
-          style={[styles.button, styles.fosterButton]} 
-          onPress={() => { 
-            router.push({ pathname: '/fostercareform', params: { petId: petId } }); 
-          }}
-        >
-          <Text style={styles.buttonText}>Request Foster Care</Text>
-        </TouchableOpacity>
+        {!isOwner && (
+          <>
+            {/* Adopt Me Button */}
+            <TouchableOpacity
+              style={[styles.button, styles.adoptButton]}
+              onPress={() => {
+                router.push({ pathname: '/adoptionform', params: { petId: petId } });
+              }}
+            >
+              <Text style={styles.buttonText}>Adopt Me</Text>
+            </TouchableOpacity>
+          </>
+        )}
+        {isOwner && (
+          <>
+            {/* Adoption Status Toggle Button */}
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: adoptionStatus === 'personal' ? '#C74C58' : '#F44336', marginBottom: 10 }]}
+              onPress={handleToggleAdoptionStatus}
+              disabled={adoptionLoading}
+            >
+              <Text style={styles.buttonText}>
+                {adoptionLoading
+                  ? (adoptionStatus === 'personal' ? 'Putting Up...' : 'Cancelling...')
+                  : (adoptionStatus === 'personal' ? 'Put Up For Adoption' : 'Cancel Adoption Request')}
+              </Text>
+            </TouchableOpacity>
+            {/* Foster Care Button */}
+            <TouchableOpacity
+              style={[styles.button, styles.fosterButton]}
+              onPress={() => {
+                router.push({ pathname: '/fostercareform', params: { petId: petId } });
+              }}
+            >
+              <Text style={styles.buttonText}>Request Foster Care</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
 
       

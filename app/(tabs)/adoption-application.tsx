@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface AdoptionApplication {
   _id: string;
@@ -17,6 +17,7 @@ export default function AdoptionApplicationDetail() {
   const [application, setApplication] = useState<AdoptionApplication | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<'approved' | 'rejected' | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -36,6 +37,26 @@ export default function AdoptionApplicationDetail() {
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  const handleStatusChange = async (status: 'approved' | 'rejected') => {
+    if (!id) return;
+    setActionLoading(status);
+    try {
+      const res = await fetch(`http://localhost:5000/api/adoption-applications/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error('Failed to update status');
+      const updated = await res.json();
+      setApplication(updated);
+      setError(null);
+    } catch (err) {
+      setError('Could not update status.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#d16d78" style={{ marginTop: 40 }} />;
@@ -72,6 +93,23 @@ export default function AdoptionApplicationDetail() {
             </View>
           );
         })}
+      </View>
+      {/* Action Buttons */}
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: '#4CAF50', marginRight: 8 }]}
+          onPress={() => handleStatusChange('approved')}
+          disabled={actionLoading !== null || application?.status === 'approved'}
+        >
+          <Text style={styles.buttonText}>{actionLoading === 'approved' ? 'Approving...' : 'Approve'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: '#F44336', marginLeft: 8 }]}
+          onPress={() => handleStatusChange('rejected')}
+          disabled={actionLoading !== null || application?.status === 'rejected'}
+        >
+          <Text style={styles.buttonText}>{actionLoading === 'rejected' ? 'Rejecting...' : 'Reject'}</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -120,6 +158,25 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     marginTop: 40,
+    fontSize: 16,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 24,
+    marginTop: 0,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
     fontSize: 16,
   },
 }); 
