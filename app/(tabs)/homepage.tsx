@@ -13,9 +13,12 @@ import {
 } from 'react-native';
 
 const categories = [
-  { id: '1', label: 'Cat', icon: require('@/assets/images/catto1.png') },
-  { id: '2', label: 'Dog', icon: require('@/assets/images/dog.png') },
-  { id: '3', label: 'Rabbit', icon: require('@/assets/images/rabit.png') },
+  { id: 'all', label: 'All', icon: require('@/assets/images/all.png') },
+  { id: 'cats', label: 'Cats', icon: require('@/assets/images/catto1.png') },
+  { id: 'dogs', label: 'Dogs', icon: require('@/assets/images/dog.png') },
+  { id: 'rabbits', label: 'Rabbits', icon: require('@/assets/images/rabit.png') },
+  { id: 'birds', label: 'Birds', icon: require('@/assets/images/bird.png') },
+  { id: 'others', label: 'Others', icon: require('@/assets/images/other.png') },
 ];
 
 const placeholderImage = require('@/assets/images/cat.png'); // Use any placeholder image you have
@@ -31,6 +34,7 @@ interface Pet {
   age?: number;
   dob?: string;
   image?: string; // Added image property
+  type?: string; // Added type property
   [key: string]: any; // For any additional properties
 }
 
@@ -41,6 +45,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   
   const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const dobTruncate = (dob: string | undefined) => {
     return dob?.split('T')[0] || 'Unknown DOB';
   }
@@ -59,8 +64,10 @@ export default function HomePage() {
         const response = await fetch('http://localhost:5000/api/pets/');
         if (!response.ok) throw new Error('Failed to fetch pets');
         const data = await response.json();
-        setPets(data);
-        setFilteredPets(data); // Initialize filtered pets with all pets
+        // Only include pets with adoptionStatus === 'up for adoption'
+        const upForAdoption = data.filter((pet: any) => (pet.adoptionStatus || pet.status) === 'up for adoption');
+        setPets(upForAdoption);
+        setFilteredPets(upForAdoption); // Initialize filtered pets with all pets
       } catch (err) {
         setPets([]);
         setFilteredPets([]);
@@ -69,7 +76,7 @@ export default function HomePage() {
       }
     };
     fetchPets();
-    console.log(pets);
+    // console.log(pets); // Don't log pets here, as it's async
   }, []);
 
   // Search functionality
@@ -90,6 +97,15 @@ export default function HomePage() {
       setFilteredPets(filtered);
     }
   }, [searchQuery, pets]);
+
+  // Category filter
+  useEffect(() => {
+    if (selectedCategory === 'all') {
+      setFilteredPets(pets);
+    } else {
+      setFilteredPets(pets.filter((pet: Pet) => pet.type === selectedCategory));
+    }
+  }, [selectedCategory, pets]);
 
   const handleSearch = () => {
     // This function can be used for additional search actions if needed
@@ -112,7 +128,7 @@ export default function HomePage() {
         router.push('/RegisterFoster');
         break;
       case 'notifications':
-        router.push('/Notifications');
+        router.push('/notifications');
         break;
       default:
         break;
@@ -243,10 +259,14 @@ export default function HomePage() {
 
       <View style={styles.categoryRow}>
         {categories.map((item) => (
-          <View key={item.id} style={styles.categoryItem}>
-            <Image source={item.icon} style={styles.categoryIcon} />
-            <Text style={styles.categoryLabel}>{item.label}</Text>
-          </View>
+          <TouchableOpacity
+            key={item.id}
+            style={[styles.categoryItem, selectedCategory === item.id && styles.selectedCategoryItem]}
+            onPress={() => setSelectedCategory(item.id)}
+          >
+            <Image source={item.icon} style={styles.categoryIcon} /> 
+            <Text style={[styles.categoryLabel, selectedCategory === item.id && styles.selectedCategoryLabel]}>{item.label}</Text>
+          </TouchableOpacity>
         ))}
       </View>
 
@@ -435,6 +455,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     marginBottom: 6,
+    borderRadius: 10,
   },
   categoryLabel: {
     fontSize: 13,
@@ -533,5 +554,14 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: '500',
     flex: 1,
+  },
+  selectedCategoryItem: {
+    backgroundColor: '#ffe6ea',
+    borderRadius: 16,
+    padding: 4,
+  },
+  selectedCategoryLabel: {
+    color: '#d16d78',
+    fontWeight: 'bold',
   },
 });
