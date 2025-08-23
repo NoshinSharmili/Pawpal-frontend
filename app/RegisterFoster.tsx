@@ -95,7 +95,7 @@ export default function RegisterFoster() {
     setLoading(true);
     try {
       // Here you would send the data to your backend
-      const response = await fetch('http://localhost:5000/api/foster/register', {
+      const response = await fetch('http://10.0.2.2:5000/api/foster/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

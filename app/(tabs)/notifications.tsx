@@ -20,7 +20,7 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
-    fetch(`http://localhost:5000/api/adoption-applications/user/${userId}`)
+    fetch(`http://10.0.2.2:5000/api/adoption-applications/user/${userId}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch adoption applications');
         return res.json();

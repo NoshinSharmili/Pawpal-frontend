@@ -16,7 +16,7 @@ export default function SignUpPage() {
     console.log("name, email, password");
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/users', {
+      const response = await fetch('http://10.0.2.2:5000/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email }),

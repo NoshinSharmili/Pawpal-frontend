@@ -1,17 +1,17 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Switch,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function FosterProfile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -92,7 +92,7 @@ export default function FosterProfile() {
       await AsyncStorage.setItem('fosterProfileData', JSON.stringify(profileData));
       
       // Update on server
-      const response = await fetch('http://localhost:5000/api/foster/update', {
+      const response = await fetch('http://10.0.2.2:5000/api/foster/update', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

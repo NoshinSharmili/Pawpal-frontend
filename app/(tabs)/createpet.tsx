@@ -45,7 +45,7 @@ export default function CreatePetPage() {
       const { fileName, fileType } = getFileNameAndType(asset.uri);
       try {
         // 1. Get presigned URL
-        const presignRes = await fetch('http://localhost:5000/api/pets/presigned-url', {
+        const presignRes = await fetch('http://10.0.2.2:5000/api/pets/presigned-url', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ fileName, fileType }),
@@ -104,7 +104,7 @@ export default function CreatePetPage() {
         location,
         image, // <-- add image URL
       };
-      const response = await fetch('http://localhost:5000/api/pets', {
+      const response = await fetch('http://10.0.2.2:5000/api/pets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

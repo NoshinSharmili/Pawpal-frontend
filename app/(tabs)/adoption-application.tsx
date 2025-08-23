@@ -22,7 +22,7 @@ export default function AdoptionApplicationDetail() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetch(`http://localhost:5000/api/adoption-applications/${id}`)
+    fetch(`http://10.0.2.2:5000/api/adoption-applications/${id}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch application');
         return res.json();
@@ -42,7 +42,7 @@ export default function AdoptionApplicationDetail() {
     if (!id) return;
     setActionLoading(status);
     try {
-      const res = await fetch(`http://localhost:5000/api/adoption-applications/${id}/status`, {
+      const res = await fetch(`http://10.0.2.2:5000/api/adoption-applications/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

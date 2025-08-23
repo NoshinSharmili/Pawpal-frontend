@@ -372,7 +372,7 @@ const VetFinderScreen: React.FC<VetFinderScreenProps> = ({ navigation }) => {
     // Simulate user location (replace with real geolocation if available)
     setUserLocation({ latitude: 23.7805, longitude: 90.4125 });
     // Fetch vets from API
-    fetch('http://localhost:5000/api/vets')
+    fetch('http://10.0.2.2:5000/api/vets')
       .then((response) => response.json())
       .then((data) => {
         // Map API data to Vet[]

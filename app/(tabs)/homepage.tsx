@@ -61,7 +61,7 @@ export default function HomePage() {
     const fetchPets = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5000/api/pets/');
+        const response = await fetch('http://10.0.2.2:5000/api/pets/');
         if (!response.ok) throw new Error('Failed to fetch pets');
         const data = await response.json();
         // Only include pets with adoptionStatus === 'up for adoption'

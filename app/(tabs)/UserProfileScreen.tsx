@@ -25,12 +25,12 @@ export default function UserProfileScreen() {
       setLoading(true);
       try {
         // Fetch user info
-        const userRes = await fetch(`http://localhost:5000/api/users/${userId}`);
+        const userRes = await fetch(`http://10.0.2.2:5000/api/users/${userId}`);
         if (!userRes.ok) throw new Error('Failed to fetch user');
         const userData = await userRes.json();
         setUser(userData);
         // Fetch pets
-        const petsRes = await fetch(`http://localhost:5000/api/pets/user/${userId}`);
+        const petsRes = await fetch(`http://10.0.2.2:5000/api/pets/user/${userId}`);
         if (!petsRes.ok) throw new Error('Failed to fetch pets');
         const petsData = await petsRes.json();
         setPets(petsData);
@@ -44,7 +44,7 @@ export default function UserProfileScreen() {
   }, [userId]);
 
   const renderPet = (pet: Pet) => (
-    <View key={ pet.id} style={styles.petCard}>
+    <View key={ pet._id} style={styles.petCard}>
       <Text style={styles.petName}>{pet.name} - {pet.breed}</Text>
       <TouchableOpacity style={styles.viewButton} onPress={() => router.push({ pathname: '/PetProfileScreen/[petId]', params: { petId:  pet._id } })}>
         <Text style={styles.viewButtonText}>View</Text>

@@ -40,7 +40,7 @@ export default function PetProfileScreen() {
     const fetchPet = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/pets/${petId}`);
+        const response = await fetch(`http://10.0.2.2:5000/api/pets/${petId}`);
         if (!response.ok) throw new Error('Failed to fetch pet');
         const data = await response.json();
         setPet(data);
@@ -66,7 +66,7 @@ export default function PetProfileScreen() {
     if (!pet || !pet._id && !pet.id) return;
     setAdoptionLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/pets/${pet._id || pet.id}/adoption-status`, {
+      const res = await fetch(`http://10.0.2.2:5000/api/pets/${pet._id || pet.id}/adoption-status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -91,7 +91,7 @@ export default function PetProfileScreen() {
             onPress={async () => {
               try {
                 setLoading(true);
-                const response = await fetch(`http://localhost:5000/api/pets/${pet._id || pet.id}`, {
+                const response = await fetch(`http://10.0.2.2:5000/api/pets/${pet._id || pet.id}`, {
                   method: 'DELETE',
                 });
                 if (!response.ok) throw new Error('Failed to delete pet');
@@ -174,6 +174,17 @@ export default function PetProfileScreen() {
             >
               <Text style={styles.buttonText}>Request Foster Care</Text>
             </TouchableOpacity>
+
+            {/* Health Tracker Button */}
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: '#1976D2', marginTop: 10 }]}
+              onPress={() => {
+                router.push({ pathname: '/HealthTrackerScreen', params: { petId: petId } });
+              }}
+            >
+              <Text style={styles.buttonText}>Health Tracker</Text>
+            </TouchableOpacity>
+            
           </>
         )}
       </View>
