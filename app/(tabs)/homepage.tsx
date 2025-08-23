@@ -156,18 +156,19 @@ export default function HomePage() {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
-        <Ionicons name="menu" size={28} color="#333" />
+        {/* <Ionicons name="menu" size={28} color="#333" /> */}
         <Image
           source={require('@/assets/images/logo.png')}
           style={styles.logo}
           resizeMode="contain"
+
         />
       <View style={styles.profileContainer}>
           <TouchableOpacity
             onPress={() => setShowDropdown(!showDropdown)}
             style={styles.profileButton}
           >
-            <Ionicons name="person-circle" size={32} color="#f1787e" />
+            <Ionicons name="person-circle" size={30} color="#f1787e" />
           </TouchableOpacity>
          
           {showDropdown && (
@@ -326,7 +327,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 100,
-    height: 40,
+    height: 30,
+    minHeight: 40,
   },
   searchBox: {
     flexDirection: 'row',

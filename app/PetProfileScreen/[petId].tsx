@@ -85,30 +85,37 @@ export default function PetProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 4 }}>
-        {isOwner && (
-          <TouchableOpacity
-            onPress={async () => {
-              try {
-                setLoading(true);
-                const response = await fetch(`http://10.0.2.2:5000/api/pets/${pet._id || pet.id}`, {
-                  method: 'DELETE',
-                });
-                if (!response.ok) throw new Error('Failed to delete pet');
-                router.push('/homepage');
-              } catch (err) {
-                setLoading(false);
-                alert('Failed to delete pet.');
-              }
-            }}
-            accessibilityLabel="Delete Pet"
-            style={{ padding: 8 }}
-          >
-            <Ionicons name="trash" size={28} color="#d9534f" />
-          </TouchableOpacity>
-        )}
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={{position: 'relative', marginRight: 70}}>
+          <Text style={styles.title}>Pet Profile</Text>
+        </View>
+        
+        <View style={{position: 'relative', marginLeft: 100}}>
+          {isOwner && (
+            <TouchableOpacity
+              onPress={async () => {
+                try {
+                  setLoading(true);
+                  const response = await fetch(`http://10.0.2.2:5000/api/pets/${pet._id || pet.id}`, {
+                    method: 'DELETE',
+                  });
+                  if (!response.ok) throw new Error('Failed to delete pet');
+                  router.push('/homepage');
+                } catch (err) {
+                  setLoading(false);
+                  alert('Failed to delete pet.');
+                }
+              }}
+              accessibilityLabel="Delete Pet"
+              style={{ padding: 8 }}
+            >
+              <Ionicons name="trash" size={28} color="#d9534f" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-      <Text style={styles.title}>Pet Profile</Text>
+      
       <View style={styles.card}>
         <Text style={styles.label}>Name:</Text>
         <Text style={styles.value}>{pet.name}</Text>
@@ -200,6 +207,12 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: 'center',
     flexGrow: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   title: {
     fontSize: 30,

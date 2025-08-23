@@ -121,7 +121,7 @@ export default function CreatePetPage() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Add a Pet for Adoption</Text>
+      <Text style={styles.header}>Add a Pet</Text>
       <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
