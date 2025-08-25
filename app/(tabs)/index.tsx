@@ -1,6 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Dimensions } from 'react-native';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -9,6 +8,7 @@ export default function LandingPage() {
 
   return (
     <View style={styles.container}>
+      <View style={{height: 70}}></View>
       <Text style={styles.welcomeText}>Welcome to</Text>
       <Image
           source={require('@/assets/images/logo.png')}
@@ -27,15 +27,19 @@ export default function LandingPage() {
         />
       </View>
 
+      
+
       {/* Login/Sign Up Card */}
       <View style={styles.buttonContainer}>
+      <View style={{height: 70}}></View>
         <TouchableOpacity style={styles.button} onPress={() => router.push('/login')}>
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.buttonText}>Login </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => router.push('/signup')}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.bottomContainer}></View>
     </View>
   );
 }
@@ -50,7 +54,8 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 18,
     marginBottom: 5,
-    fontWeight:'bold'
+    fontWeight:'bold',
+    fontFamily: 'Arial',
   },
   logoText: {
     fontSize: 32,
@@ -68,9 +73,18 @@ const styles = StyleSheet.create({
     height: 180,
   },
   imageLogo: {
-    width: 180,
-    height: 100,
+    width: 400,
+    height: 150,
     marginBottom: 10
+  },
+  bottomContainer: {
+    zIndex: 2,
+    backgroundColor: '#d16d78',
+    padding: 25,
+    width: '100%',
+    alignItems: 'center',
+    paddingTop: screenHeight * 0.05, // creates the visual padding above buttons
+    paddingBottom: screenHeight * 0.15, // creates the visual padding above buttons
   },
   buttonContainer: {
     zIndex: 2,
@@ -84,12 +98,15 @@ const styles = StyleSheet.create({
     paddingBottom: screenHeight * 0.15, // creates the visual padding above buttons
   },
   button: {
+    width: '60%',
+    height: 50,
     borderWidth: 2,
     borderColor: '#fff',
     borderRadius: 25,
     paddingVertical: 10,
     paddingHorizontal: 60,
     marginVertical: 10,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',

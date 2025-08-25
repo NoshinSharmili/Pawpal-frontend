@@ -1,7 +1,7 @@
+import { useUser } from '@/context/UserContext';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
 const screenHeight = Dimensions.get('window').height;
 
 interface FormErrors {
@@ -17,6 +17,7 @@ interface FormErrors {
 
 export default function AdoptionForm() {
   const router = useRouter();
+  const { userId } = useUser();
   const { petId } = useLocalSearchParams();
   const [fullName, setFullName] = useState('');
   const [profession, setProfession] = useState('');
@@ -125,6 +126,7 @@ export default function AdoptionForm() {
           nidNumber: nidNumber.trim(),
           phoneNumber: phoneNumber.trim(),
           reasonToAdopt: reasonToAdopt.trim(),
+          userId
         }),
       });
       if (!response.ok) throw new Error('Failed to submit application');

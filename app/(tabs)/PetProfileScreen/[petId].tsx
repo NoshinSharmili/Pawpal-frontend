@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useUser } from '../../context/UserContext';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useUser } from '../../../context/UserContext';
 
 interface Pet {
   id?: string;
@@ -13,6 +13,7 @@ interface Pet {
   vaccinationStatus: boolean;
   healthStatus: string;
   notes?: string;
+  image?: string; // Add image field
   // Add any other fields you expect from the API
 }
 
@@ -87,11 +88,12 @@ export default function PetProfileScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={{position: 'relative', marginRight: 70}}>
-          <Text style={styles.title}>Pet Profile</Text>
-        </View>
-        
-        <View style={{position: 'relative', marginLeft: 100}}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#f1787e" />
+        </TouchableOpacity>
+        <View style={{width : 50}}></View>
+        <Text style={styles.title}>Pet Profile</Text>
+        <View style={{marginLeft : 100}}>
           {isOwner && (
             <TouchableOpacity
               onPress={async () => {
@@ -115,10 +117,18 @@ export default function PetProfileScreen() {
           )}
         </View>
       </View>
-      
+    
+      {/* Pet Photo */}
+      <View style={styles.photoContainer}>
+        <Image
+          source={pet.image ? { uri: pet.image } : require('@/assets/images/cat.png')}
+          style={styles.petPhoto}
+          resizeMode="cover"
+        />
+        <Text style={{alignItems:'center', fontWeight: 'bold', color: '#C74C58', fontSize: 22,  paddingTop: 10}}>{pet.name}</Text>
+      </View>
+
       <View style={styles.card}>
-        <Text style={styles.label}>Name:</Text>
-        <Text style={styles.value}>{pet.name}</Text>
 
         <Text style={styles.label}>Breed:</Text>
         <Text style={styles.value}>{pet.breed}</Text>
@@ -176,7 +186,7 @@ export default function PetProfileScreen() {
             <TouchableOpacity
               style={[styles.button, styles.fosterButton]}
               onPress={() => {
-                router.push({ pathname: '/fostercareform', params: { petId: petId } });
+                router.push({ pathname: '/(tabs)/FosterFinderScreen', params: { petId: petId } });
               }}
             >
               <Text style={styles.buttonText}>Request Foster Care</Text>
@@ -203,6 +213,7 @@ export default function PetProfileScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: '#fff',
     padding: 24,
     alignItems: 'center',
@@ -212,14 +223,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+    backgroundColor: '#fff',
+  },
+  backButton: {
+    padding: 8,
+    marginRight: 40
   },
   title: {
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#C74C58',
-    marginBottom: 18,
-    alignSelf: 'flex-start',
+    color: '#333',
   },
   card: {
     width: '100%',
@@ -253,7 +269,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 40,
-    marginTop: 10,
     width: '100%',
     alignItems: 'center',
     elevation: 2,
@@ -294,5 +309,16 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 10,
     textAlign: 'center',
+  },
+  photoContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  petPhoto: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+    borderColor: '#f1787e',
   },
 });

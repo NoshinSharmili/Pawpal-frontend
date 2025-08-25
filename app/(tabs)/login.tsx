@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useUser } from '../context/UserContext';
+import { useUser } from '../../context/UserContext';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -84,7 +84,14 @@ export default function LoginPage() {
         <TouchableOpacity>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>
+        <View style={{ flexDirection: 'row', marginTop: 18, justifyContent: 'center' }}>
+          <Text style={{ color: '#fff', fontSize: 13 }}>Don't have an account?</Text>
+          <TouchableOpacity onPress={() => router.push('/signup')}>
+            <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600', textDecorationLine: 'underline', marginLeft: 4 }}>Sign up!</Text>
+          </TouchableOpacity>
+        </View>
       </View>
+      {/* <View style={styles.bottomContainer}></View> */}
     </ScrollView>
   );
 }
@@ -97,13 +104,12 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 14,
     color: '#555',
-    marginTop: 30,
+    marginTop: 80,
     marginBottom: 8,
   },
   logo: {
-    width: 130,
-    height: 60,
-    marginBottom: 0,
+    width: 230,
+    height: 150,
   },
   catWrapper: {
     width: '100%',
@@ -118,7 +124,6 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: '#d16d78',
     width: '100%',
-    maxWidth: 400,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 25,
@@ -168,6 +173,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#fff',
     textDecorationLine: 'underline',
+  },
+  bottomContainer: {
+    zIndex: 2,
+    backgroundColor: '#d16d78',
+    padding: 25,
+    width: '100%',
+    alignItems: 'center',
+    paddingTop: screenHeight * 0.05, // creates the visual padding above buttons
+    paddingBottom: screenHeight * 0.15, // creates the visual padding above buttons
   },
 });
 

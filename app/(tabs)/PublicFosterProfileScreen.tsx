@@ -1,19 +1,10 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
-import { useUser } from '../../context/UserContext';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function FosterProfile() {
-  const { userId } = useUser();
+export default function PublicFosterProfileScreen() {
+  const { fosterId } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<null | {
     fosterName: string;
@@ -26,19 +17,16 @@ export default function FosterProfile() {
     details?: string;
     totalPetsFosterd: number;
     currentNumberOfFosterPets: number;
-    _id: string; // Added _id for update
   }>(null);
-  const [updatingFosterCount, setUpdatingFosterCount] = useState(false);
-  const [updatingAvailability, setUpdatingAvailability] = useState(false);
 
   useEffect(() => {
-    if (userId) fetchProfile();
-  }, [userId]);
+    if (fosterId) fetchProfile();
+  }, [fosterId]);
 
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://10.0.2.2:5000/api/fosters/user/${userId}`);
+      const res = await fetch(`http://10.0.2.2:5000/api/fosters/${fosterId}`);
       if (!res.ok) throw new Error('Failed to fetch profile');
       const data = await res.json();
       setProfile(data);
@@ -49,50 +37,10 @@ export default function FosterProfile() {
     }
   };
 
-  const updateCurrentFosterCount = async (newCount: number) => {
-    if (!profile || updatingFosterCount) return;
-    setUpdatingFosterCount(true);
-    const prev = profile.currentNumberOfFosterPets;
-    setProfile({ ...profile, currentNumberOfFosterPets: newCount });
-    try {
-      const res = await fetch(`http://10.0.2.2:5000/api/fosters/${profile._id}/currentNumberOfFosterPets`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentNumberOfFosterPets: newCount })
-      });
-      if (!res.ok) throw new Error('Failed to update');
-    } catch (err) {
-      setProfile({ ...profile, currentNumberOfFosterPets: prev });
-      Alert.alert('Error', 'Could not update currently fostering count.');
-    } finally {
-      setUpdatingFosterCount(false);
-    }
-  };
-
-  const updateAvailabilityStatus = async (newStatus: 'available' | 'unavailable') => {
-    if (!profile || updatingAvailability) return;
-    setUpdatingAvailability(true);
-    const prev = profile.availabilityStatus;
-    setProfile({ ...profile, availabilityStatus: newStatus });
-    try {
-      const res = await fetch(`http://10.0.2.2:5000/api/fosters/${profile._id}/availability`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ availabilityStatus: newStatus })
-      });
-      if (!res.ok) throw new Error('Failed to update');
-    } catch (err) {
-      setProfile({ ...profile, availabilityStatus: prev });
-      Alert.alert('Error', 'Could not update availability status.');
-    } finally {
-      setUpdatingAvailability(false);
-    }
-  };
-
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#f1787e" />
       </View>
     );
   }
@@ -112,7 +60,7 @@ export default function FosterProfile() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#f1787e" />
         </TouchableOpacity>
-        <Text style={styles.title}>Foster Profile</Text>
+        <Text style={styles.title}>{profile.fosterName}</Text>
         <View style={{ width: 32 }} />
       </View>
 
@@ -134,15 +82,6 @@ export default function FosterProfile() {
               </Text>
             </View>
           </View>
-          <Switch
-            trackColor={{ false: '#767577', true: '#4CAF50' }}
-            thumbColor={profile.availabilityStatus === 'available' ? '#fff' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={() => updateAvailabilityStatus(profile.availabilityStatus === 'available' ? 'unavailable' : 'available')}
-            value={profile.availabilityStatus === 'available'}
-            disabled={updatingAvailability}
-            style={styles.availabilitySwitch}
-          />
         </View>
       </View>
 
@@ -154,23 +93,7 @@ export default function FosterProfile() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            <TouchableOpacity
-              onPress={() => updateCurrentFosterCount(profile.currentNumberOfFosterPets - 1)}
-              disabled={profile.currentNumberOfFosterPets <= 0 || updatingFosterCount}
-              style={{ marginRight: 8, opacity: profile.currentNumberOfFosterPets <= 0 || updatingFosterCount ? 0.5 : 1 }}
-            >
-              <Ionicons name="remove-circle-outline" size={24} color="#f1787e" />
-            </TouchableOpacity>
-            <Text style={styles.statNumber}>{profile.currentNumberOfFosterPets}</Text>
-            <TouchableOpacity
-              onPress={() => updateCurrentFosterCount(profile.currentNumberOfFosterPets + 1)}
-              disabled={updatingFosterCount}
-              style={{ marginLeft: 8, opacity: updatingFosterCount ? 0.5 : 1 }}
-            >
-              <Ionicons name="add-circle-outline" size={24} color="#f1787e" />
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.statNumber}>{profile.currentNumberOfFosterPets}</Text>
           <Text style={styles.statLabel}>Currently Fostering</Text>
         </View>
         <View style={styles.statDivider} />
@@ -249,9 +172,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
-  editButton: {
-    padding: 8,
-  },
   statusCard: {
     marginHorizontal: 20,
     marginVertical: 20,
@@ -296,9 +216,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 2,
-  },
-  availabilitySwitch: {
-    transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
   },
   statsContainer: {
     flexDirection: 'row',
@@ -346,8 +263,8 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   sectionTitle: {
-    fontSize: 18,
     fontWeight: 'bold',
+    fontSize: 16,
     color: '#333',
     marginBottom: 16,
   },
@@ -364,115 +281,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     lineHeight: 22,
-  },
-  fieldInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-  },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  flex1: {
-    flex: 1,
-  },
-  marginLeft: {
-    marginLeft: 12,
-  },
-  petTypeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  petTypeButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#f9f9f9',
-  },
-  petTypeButtonSelected: {
-    backgroundColor: '#f1787e',
-    borderColor: '#f1787e',
-  },
-  petTypeText: {
-    color: '#666',
-    fontSize: 14,
-  },
-  petTypeTextSelected: {
-    color: '#fff',
-  },
-  optionColumn: {
-    gap: 12,
-  },
-  radioRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#ddd',
-    marginRight: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioSelected: {
-    borderColor: '#f1787e',
-  },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#f1787e',
-  },
-  radioLabel: {
-    fontSize: 16,
-    color: '#333',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    marginTop: 20,
-    gap: 12,
-  },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: '#666',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  saveButton: {
-    flex: 1,
-    backgroundColor: '#f1787e',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  saveButtonDisabled: {
-    backgroundColor: '#ccc',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   bottomSpace: {
     height: 40,

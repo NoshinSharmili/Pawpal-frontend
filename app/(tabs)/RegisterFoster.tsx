@@ -2,43 +2,47 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { useUser } from '../../context/UserContext';
 
 export default function RegisterFoster() {
-  const [formData, setFormData] = useState({
-    fullName: '',
+  const [formData, setFormData] = useState<{
+    fosterName: string;
+    email: string;
+    phone: string;
+    address: string;
+    preferredPets: string[];
+    capacity: string;
+    availabilityStatus: 'available' | 'unavailable';
+    details: string;
+    totalPetsFosterd: string;
+  }>({
+    fosterName: '',
     email: '',
     phone: '',
     address: '',
-    city: '',
-    zipCode: '',
-    experience: '',
     preferredPets: [],
-    maxPets: '',
-    homeType: '',
-    hasYard: false,
-    hasOtherPets: false,
-    otherPetsDetails: '',
-    availability: '',
-    emergencyContact: '',
-    emergencyPhone: '',
-    specialRequirements: '',
+    capacity: '',
+    availabilityStatus: 'available',
+    details: '',
+    totalPetsFosterd: '0',
   });
 
   const [loading, setLoading] = useState(false);
+  const { userId } = useUser();
+  const petTypes = ['Dogs', 'Cats', 'Rabbits', 'Birds', 'Others'];
+  const availabilityStatusOptions = ['available', 'unavailable'];
 
-  const petTypes = ['Dogs', 'Cats', 'Rabbits', 'Birds', 'Small Animals'];
-  const homeTypes = ['House', 'Apartment', 'Condo', 'Townhouse'];
-  const availabilityOptions = ['Full Time', 'Part Time', 'Weekends Only', 'Emergency Only'];
+  type FosterFormKey = keyof typeof formData;
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: FosterFormKey, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -54,59 +58,60 @@ export default function RegisterFoster() {
     }));
   };
 
-  const handleBooleanToggle = (field: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: !prev[field]
-    }));
-  };
-
   const validateForm = () => {
-    const required = ['fullName', 'email', 'phone', 'address', 'city', 'emergencyContact', 'emergencyPhone'];
-    
+    const required: FosterFormKey[] = ['fosterName', 'email', 'phone', 'address', 'capacity'];
     for (let field of required) {
-      if (!formData[field].trim()) {
+      if (!formData[field] || (typeof formData[field] === 'string' && (formData[field] as string).trim() === '')) {
         Alert.alert('Error', `Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
         return false;
       }
     }
-
     if (formData.preferredPets.length === 0) {
       Alert.alert('Error', 'Please select at least one preferred pet type');
       return false;
     }
-
-    if (!formData.homeType) {
-      Alert.alert('Error', 'Please select your home type');
+    if (!formData.availabilityStatus) {
+      Alert.alert('Error', 'Please select your availability status');
       return false;
     }
-
-    if (!formData.availability) {
-      Alert.alert('Error', 'Please select your availability');
+    if (isNaN(Number(formData.capacity)) || Number(formData.capacity) <= 0) {
+      Alert.alert('Error', 'Capacity must be a positive number');
       return false;
     }
-
+    if (isNaN(Number(formData.totalPetsFosterd)) || Number(formData.totalPetsFosterd) < 0) {
+      Alert.alert('Error', 'Pets fostered must be 0 or a positive number');
+      return false;
+    }
     return true;
   };
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-
     setLoading(true);
     try {
-      // Here you would send the data to your backend
-      const response = await fetch('http://10.0.2.2:5000/api/foster/register', {
+      const payload = {
+        user: userId,
+        fosterName: formData.fosterName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        preferredPets: formData.preferredPets,
+        totalPetsFosterd: Number(formData.totalPetsFosterd),
+        capacity: Number(formData.capacity),
+        availabilityStatus: formData.availabilityStatus,
+        details: formData.details,
+      };
+      const response = await fetch('http://10.0.2.2:5000/api/fosters', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
-
       if (response.ok) {
         Alert.alert(
-          'Success!', 
-          'Thank you for registering as a foster! We will review your application and contact you soon.',
+          'Success!',
+          'Thank you for registering as a foster! ',
           [
             {
               text: 'OK',
@@ -147,18 +152,16 @@ export default function RegisterFoster() {
       {/* Personal Information */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Personal Information</Text>
-        
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Full Name *</Text>
           <TextInput
             style={styles.input}
-            value={formData.fullName}
-            onChangeText={(value) => handleInputChange('fullName', value)}
+            value={formData.fosterName}
+            onChangeText={(value) => handleInputChange('fosterName', value)}
             placeholder="Enter your full name"
             placeholderTextColor="#999"
           />
         </View>
-
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Email Address *</Text>
           <TextInput
@@ -170,7 +173,6 @@ export default function RegisterFoster() {
             keyboardType="email-address"
           />
         </View>
-
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Phone Number *</Text>
           <TextInput
@@ -183,11 +185,9 @@ export default function RegisterFoster() {
           />
         </View>
       </View>
-
       {/* Address Information */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Address Information</Text>
-        
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Street Address *</Text>
           <TextInput
@@ -198,107 +198,10 @@ export default function RegisterFoster() {
             placeholderTextColor="#999"
           />
         </View>
-
-        <View style={styles.row}>
-          <View style={[styles.inputGroup, styles.flex1]}>
-            <Text style={styles.label}>City *</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.city}
-              onChangeText={(value) => handleInputChange('city', value)}
-              placeholder="City"
-              placeholderTextColor="#999"
-            />
-          </View>
-          <View style={[styles.inputGroup, styles.flex1, styles.marginLeft]}>
-            <Text style={styles.label}>Zip Code</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.zipCode}
-              onChangeText={(value) => handleInputChange('zipCode', value)}
-              placeholder="Zip"
-              placeholderTextColor="#999"
-              keyboardType="numeric"
-            />
-          </View>
-        </View>
       </View>
-
-      {/* Home Information
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Home Information</Text>
-        
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Home Type *</Text>
-          <View style={styles.optionRow}>
-            {homeTypes.map((type) => (
-              <TouchableOpacity
-                key={type}
-                style={[
-                  styles.optionButton,
-                  formData.homeType === type && styles.optionButtonSelected
-                ]}
-                onPress={() => handleInputChange('homeType', type)}
-              >
-                <Text style={[
-                  styles.optionText,
-                  formData.homeType === type && styles.optionTextSelected
-                ]}>
-                  {type}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.inputGroup}>
-          <TouchableOpacity
-            style={styles.checkboxRow}
-            onPress={() => handleBooleanToggle('hasYard')}
-          >
-            <View style={[styles.checkbox, formData.hasYard && styles.checkboxChecked]}>
-              {formData.hasYard && (
-                <Ionicons name="checkmark" size={16} color="#fff" />
-              )}
-            </View>
-            <Text style={styles.checkboxLabel}>I have a yard/outdoor space</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.inputGroup}>
-          <TouchableOpacity
-            style={styles.checkboxRow}
-            onPress={() => handleBooleanToggle('hasOtherPets')}
-          >
-            <View style={[styles.checkbox, formData.hasOtherPets && styles.checkboxChecked]}>
-              {formData.hasOtherPets && (
-                <Ionicons name="checkmark" size={16} color="#fff" />
-              )}
-            </View>
-            <Text style={styles.checkboxLabel}>I have other pets</Text>
-          </TouchableOpacity>
-        </View>
-
-        {formData.hasOtherPets && (
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Tell us about your other pets</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={formData.otherPetsDetails}
-              onChangeText={(value) => handleInputChange('otherPetsDetails', value)}
-              placeholder="Describe your current pets..."
-              placeholderTextColor="#999"
-              multiline
-              numberOfLines={3}
-            />
-          </View>
-        )}
-      </View> */}
-
       {/* Foster Preferences */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Foster Preferences</Text>
-        
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Preferred Pet Types *</Text>
           <View style={styles.petTypeGrid}>
@@ -321,97 +224,64 @@ export default function RegisterFoster() {
             ))}
           </View>
         </View>
-
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Maximum number of pets you can foster</Text>
+          <Text style={styles.label}>Capacity (Maximum number of pets you can foster) *</Text>
           <TextInput
             style={styles.input}
-            value={formData.maxPets}
-            onChangeText={(value) => handleInputChange('maxPets', value)}
+            value={formData.capacity}
+            onChangeText={(value) => handleInputChange('capacity', value)}
             placeholder="e.g., 1 or 2"
             placeholderTextColor="#999"
             keyboardType="numeric"
           />
         </View>
-
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Experience with pets</Text>
+          <Text style={styles.label}>Pets Fostered</Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
-            value={formData.experience}
-            onChangeText={(value) => handleInputChange('experience', value)}
-            placeholder="Tell us about your experience with pets..."
+            style={styles.input}
+            value={formData.totalPetsFosterd}
+            onChangeText={(value) => handleInputChange('totalPetsFosterd', value)}
+            placeholder="e.g., 0"
             placeholderTextColor="#999"
-            multiline
-            numberOfLines={3}
+            keyboardType="numeric"
           />
         </View>
       </View>
-
-      {/* Availability */}
+      {/* Availability Status */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Availability</Text>
-        
+        <Text style={styles.sectionTitle}>Availability Status *</Text>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>When are you available? *</Text>
-          <View style={styles.optionColumn}>
-            {availabilityOptions.map((option) => (
+          <View style={styles.optionRow}>
+            {availabilityStatusOptions.map((option) => (
               <TouchableOpacity
                 key={option}
-                style={styles.radioRow}
-                onPress={() => handleInputChange('availability', option)}
+                style={[
+                  styles.optionButton,
+                  formData.availabilityStatus === option && styles.optionButtonSelected
+                ]}
+                onPress={() => handleInputChange('availabilityStatus', option as 'available' | 'unavailable')}
               >
-                <View style={[styles.radio, formData.availability === option && styles.radioSelected]}>
-                  {formData.availability === option && (
-                    <View style={styles.radioDot} />
-                  )}
-                </View>
-                <Text style={styles.radioLabel}>{option}</Text>
+                <Text style={[
+                  styles.optionText,
+                  formData.availabilityStatus === option && styles.optionTextSelected
+                ]}>
+                  {option.charAt(0).toUpperCase() + option.slice(1)}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
       </View>
-
-      {/* Emergency Contact */}
+      {/* Details */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Emergency Contact</Text>
-        
+        <Text style={styles.sectionTitle}>Additional Details</Text>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Emergency Contact Name *</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.emergencyContact}
-            onChangeText={(value) => handleInputChange('emergencyContact', value)}
-            placeholder="Contact person name"
-            placeholderTextColor="#999"
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Emergency Contact Phone *</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.emergencyPhone}
-            onChangeText={(value) => handleInputChange('emergencyPhone', value)}
-            placeholder="Contact person phone"
-            placeholderTextColor="#999"
-            keyboardType="phone-pad"
-          />
-        </View>
-      </View>
-
-      {/* Additional Information */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Additional Information</Text>
-        
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Special requirements or notes</Text>
+          <Text style={styles.label}>Details (Experience, special requirements, etc.)</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
-            value={formData.specialRequirements}
-            onChangeText={(value) => handleInputChange('specialRequirements', value)}
-            placeholder="Any special requirements, allergies, or additional information..."
+            value={formData.details}
+            onChangeText={(value) => handleInputChange('details', value)}
+            placeholder="Tell us about your experience, requirements, etc."
             placeholderTextColor="#999"
             multiline
             numberOfLines={4}

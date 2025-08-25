@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useUser } from '../../context/UserContext';
 
 const categories = [
   { id: 'all', label: 'All', icon: require('@/assets/images/all.png') },
@@ -39,6 +40,7 @@ interface Pet {
 }
 
 export default function HomePage() {
+  const { userId } = useUser();
   const [pets, setPets] = useState<Pet[]>([]);
   const [filteredPets, setFilteredPets] = useState<Pet[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,6 +48,7 @@ export default function HomePage() {
   
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [hasFosterProfile, setHasFosterProfile] = useState(false);
   const dobTruncate = (dob: string | undefined) => {
     return dob?.split('T')[0] || 'Unknown DOB';
   }
@@ -78,6 +81,19 @@ export default function HomePage() {
     fetchPets();
     // console.log(pets); // Don't log pets here, as it's async
   }, []);
+
+  useEffect(() => {
+    const fetchFosterProfile = async () => {
+      if (!userId) return;
+      try {
+        const res = await fetch(`http://10.0.2.2:5000/api/fosters/user/${userId}`);
+        setHasFosterProfile(res.ok);
+      } catch {
+        setHasFosterProfile(false);
+      }
+    };
+    fetchFosterProfile();
+  }, [userId]);
 
   // Search functionality
   useEffect(() => {
@@ -125,7 +141,11 @@ export default function HomePage() {
         router.push('/UserProfileScreen');
         break;
       case 'foster':
-        router.push('/RegisterFoster');
+        if (hasFosterProfile) {
+          router.push('/FosterProfile');
+        } else {
+          router.push('/RegisterFoster');
+        }
         break;
       case 'notifications':
         router.push('/notifications');
@@ -186,7 +206,7 @@ export default function HomePage() {
                 onPress={() => handleDropdownOption('foster')}
               >
                 <MaterialCommunityIcons name="heart-plus" size={20} color="#f1787e" />
-                <Text style={styles.dropdownText}>Register as Foster</Text>
+                <Text style={styles.dropdownText}>{hasFosterProfile ? 'Your Foster Profile' : 'Register as Foster'}</Text>
               </TouchableOpacity>
              
               <TouchableOpacity
@@ -224,29 +244,32 @@ export default function HomePage() {
       {/* Vet Banner */}
       <View style={styles.banner}>
         <View style={styles.bannerContent}>
-          <MaterialCommunityIcons name="stethoscope" size={24} color="#fff" style={styles.bannerIcon} />
+          <MaterialCommunityIcons name="stethoscope" size={28} color="#fff" style={styles.bannerIcon} />
           <Text style={styles.bannerText}>Is your pet{"\n"}okay?</Text>
         </View>
         <TouchableOpacity 
           style={styles.seekHelpButton}
           onPress={() => {
-            // You can replace this with your actual vet screen route
-            // For now, using a placeholder action
-            console.log('Navigate to vet screen');
-            // Uncomment and replace with your actual route:
-            // router.push('/vet' as any); 
-            // or router.push('/VetScreen' as any);
-            // or create the VetScreen component first
+            router.push('/VetFinderScreen');
           }}
         >
-          <TouchableOpacity 
-  style={styles.seekHelpButton}
-  onPress={() => {
-    router.push('/VetFinderScreen'); // Navigate to VetFinderScreen
-  }}
->
-  <Text style={styles.seekHelpButtonText}>Seek Help</Text>
-</TouchableOpacity>
+          <Text style={styles.seekHelpButtonText}>Seek Help</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Foster Finder Banner */}
+      <View style={[styles.banner, {backgroundColor: '#f89a9f'}]}>
+        <View style={styles.bannerContent}>
+          <MaterialCommunityIcons name="home-circle-outline" size={28} color="#fff" style={styles.bannerIcon} />
+          <Text style={styles.bannerText}>Looking for a {"\n"}foster home?</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.seekHelpButton}
+          onPress={() => {
+            router.push('/FosterFinderScreen');
+          }}
+        >
+          <Text style={styles.seekHelpButtonText}>See Fosters</Text>
         </TouchableOpacity>
       </View>
 
@@ -395,7 +418,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
     zIndex: -1,
   },
   bannerContent: {
@@ -412,6 +435,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   seekHelpButton: {
+    width: '40%',
+    height: '90%',
+    alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 999,
     paddingHorizontal: 20,

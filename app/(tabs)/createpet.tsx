@@ -130,11 +130,10 @@ export default function CreatePetPage() {
         )}
       </TouchableOpacity>
       <TextInput style={styles.input} placeholder="Pet Name*" value={name} onChangeText={setName} />
-      
+      <View style = {styles.pickerContainer}>
         <Picker
           selectedValue={type}
           onValueChange={(itemValue: string) => setType(itemValue)}
-          style={styles.picker}
         >
           <Picker.Item label="Select Category*" value="" />
           <Picker.Item label="Cats" value="cats" />
@@ -143,6 +142,7 @@ export default function CreatePetPage() {
           <Picker.Item label="Birds" value="birds" />
           <Picker.Item label="Others" value="others" />
         </Picker>
+        </View>
       
       {categoryError ? <Text style={{ color: 'red', marginBottom: 10 }}>{categoryError}</Text> : null}
       <TextInput style={styles.input} placeholder="Breed" value={breed} onChangeText={setBreed} />
@@ -238,7 +238,6 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: '100%',
-    height: 44,
     color: '#333',
     backgroundColor: '#fff',
     borderColor: '#d16d78',

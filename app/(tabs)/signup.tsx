@@ -34,6 +34,16 @@ export default function SignUpPage() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {/* Top Heading */}
+      <Text style={styles.welcomeText}>Create your account</Text>
+      {/* Top Logo */}
+      <View >
+        <Image
+          source={require('@/assets/images/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
       {/* Top Cat Image (No Welcome) */}
       <View style={styles.catTopWrapper}>
         <Image
@@ -114,16 +124,15 @@ const styles = StyleSheet.create({
   catImage: {
     width: 160,
     height: 160,
-    marginBottom: -screenHeight * 0.1, // pulls form up behind the cat
+    marginBottom: -screenHeight * 0.05, // pulls form up behind the cat
   },
   formCard: {
     backgroundColor: '#d16d78',
     width: '100%',
-    maxWidth: 400,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 25,
-    paddingTop: screenHeight * 0.12, // leaves space under the cat
+    paddingTop: screenHeight * 0.08, // leaves space under the cat
     paddingBottom: 40,
     alignItems: 'center',
     zIndex: 2,
@@ -183,6 +192,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textDecorationLine: 'underline',
     marginLeft: 4,
+  },
+  logo: {
+    width: 230,
+    height: 150,
+  },
+  welcomeText: {
+    fontSize: 14,
+    color: '#555',
+    marginTop: 80,
   },
 });
 

@@ -1,7 +1,9 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../../context/UserContext';
+
 
 interface Pet {
   id: string;
@@ -61,9 +63,20 @@ export default function UserProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>User Profile</Text>
-      <Text style={styles.userName}>{user.name}</Text>
-      <Text style={styles.userEmail}>{user.email}</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.replace('/(tabs)/homepage')} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#f1787e" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Your Profile</Text>
+        <View style={{ width: 32 }} />
+      </View>
+      
+      <Text style={styles.sectionTitle}>Personal Information</Text>
+      <View style={styles.petCard}>
+        
+      <Text style={styles.userName}>Name: {user.name}</Text>
+      <Text style={styles.userEmail}>Email: {user.email}</Text>
+      </View>
       <Text style={styles.sectionTitle}>Your Pets</Text>
       {pets.length > 0 ? pets.map(renderPet) : <Text>No pets found.</Text>}
       <TouchableOpacity style={styles.addButton} onPress={() => router.replace('/createpet')}>
@@ -75,7 +88,7 @@ export default function UserProfileScreen() {
         <TouchableOpacity 
           style={[styles.button, styles.registerFosterButton]} 
           onPress={() => { 
-            router.push('/registerfoster'); 
+            router.push('/RegisterFoster'); 
           }}
         >
           <Text style={[styles.buttonText, styles.registerFosterText]}>Register as a Foster</Text>
@@ -87,17 +100,25 @@ export default function UserProfileScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: '#fff',
-    padding: 24,
+    padding: 20,
+    paddingTop: 60,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    flexGrow: 1,
+    paddingBottom: 20,
+    backgroundColor: '#fff',
+  },
+  backButton: {
+    padding: 0,
   },
   title: {
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#C74C58',
-    marginBottom: 12,
-    alignSelf: 'flex-start',
+    color: '#333',
   },
   userName: {
     fontSize: 22,
