@@ -8,28 +8,32 @@ const screenHeight = Dimensions.get('window').height;
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { setUserId } = useUser();
   
   const handleLogin = async () => {
-    
     setLoading(true);
     try {
       const response = await fetch('http://10.0.2.2:5000/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
       });
-      
       if (!response.ok) throw new Error('Login failed');
-      const data = await response.json();
-      if (!data.userId) throw new Error('No userId returned');
-      
-      
-      setUserId(data.userId);
+      // Now check session to get userId
+      const sessionRes = await fetch('http://10.0.2.2:5000/api/users/session', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!sessionRes.ok) throw new Error('Session check failed');
+      const sessionData = await sessionRes.json();
+      if (!sessionData.loggedIn || !sessionData.userId) throw new Error('No userId returned');
+      setUserId(sessionData.userId);
       router.replace('/homepage');
     } catch (err) {
-      Alert.alert('Login failed', 'Please check your email and try again.');
+      Alert.alert('Login failed', 'Please check your email and password and try again.');
     } finally {
       setLoading(false);
     }
@@ -75,7 +79,9 @@ export default function LoginPage() {
             placeholderTextColor="#888"
             style={styles.input}
             secureTextEntry
-            editable={false}
+            value={password}
+            onChangeText={setPassword}
+            autoCapitalize="none"
           />
         </View>
         <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>

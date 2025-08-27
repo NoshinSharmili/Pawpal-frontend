@@ -2,31 +2,54 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useUser } from '../../context/UserContext';
 
 const screenHeight = Dimensions.get('window').height;
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { setUserId } = useUser();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
-    console.log("name, email, password");
     setLoading(true);
     try {
       const response = await fetch('http://10.0.2.2:5000/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email }),
+        credentials: 'include',
+        body: JSON.stringify({ name, email, password }),
       });
-      if (!response.ok) throw new Error('Signup failed');
-      // You can handle navigation or success feedback here
+      if (!response.ok) {
+        let msg = 'Signup failed.';
+        try {
+          const errData = await response.json();
+          if (errData && errData.error && typeof errData.error === 'string') {
+            if (errData.error.includes('duplicate key') || errData.error.includes('email')) {
+              msg = 'An account with this email already exists.';
+            } else {
+              msg = errData.error;
+            }
+          }
+        } catch {}
+        throw new Error(msg);
+      }
+      // Now check session to get userId
+      const sessionRes = await fetch('http://10.0.2.2:5000/api/users/session', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!sessionRes.ok) throw new Error('Session check failed');
+      const sessionData = await sessionRes.json();
+      if (!sessionData.loggedIn || !sessionData.userId) throw new Error('No userId returned');
+      setUserId(sessionData.userId);
       alert('Signup successful!');
-      // router.push('/login'); // Optionally navigate
-    } catch (err) {
-      alert('Signup failed. Please try again.');
+      router.back(); 
+    } catch (err: any) {
+      alert(err.message || 'Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }
