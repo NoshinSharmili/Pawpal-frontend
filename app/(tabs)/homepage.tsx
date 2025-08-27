@@ -150,6 +150,9 @@ export default function HomePage() {
       case 'notifications':
         router.push('/notifications');
         break;
+      case 'community':
+        router.push('/CommunityScreen');
+        break;
       default:
         break;
     }
@@ -210,11 +213,18 @@ export default function HomePage() {
               </TouchableOpacity>
              
               <TouchableOpacity
-                style={[styles.dropdownItem, styles.lastDropdownItem]}
+                style={styles.dropdownItem}
                 onPress={() => handleDropdownOption('notifications')}
               >
                 <Ionicons name="notifications-outline" size={20} color="#f1787e" />
                 <Text style={styles.dropdownText}>Notifications</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.dropdownItem, styles.lastDropdownItem]}
+                onPress={() => handleDropdownOption('community')}
+              >
+                <MaterialCommunityIcons name="account-group-outline" size={20} color="#f1787e" />
+                <Text style={styles.dropdownText}>Community</Text>
               </TouchableOpacity>
             </View>
           )}
