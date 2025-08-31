@@ -186,7 +186,7 @@ export default function PetProfileScreen() {
             <TouchableOpacity
               style={[styles.button, styles.fosterButton]}
               onPress={() => {
-                router.push({ pathname: '/(tabs)/FosterFinderScreen', params: { petId: petId } });
+                router.push({ pathname: '/FosterFinderScreen', params: { petId: petId } });
               }}
             >
               <Text style={styles.buttonText}>Request Foster Care</Text>

@@ -230,7 +230,7 @@ export default function FosterProfile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#efcbd6ff',
   },
   header: {
     flexDirection: 'row',
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flex: 1,
-    backgroundColor: '#f1787e',
+    backgroundColor: '#ea4c54ff',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
