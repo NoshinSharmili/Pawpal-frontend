@@ -1,4 +1,5 @@
 import { useUser } from '@/context/UserContext';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -148,8 +149,17 @@ export default function AdoptionForm() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Adoption Application</Text>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => router.push('/homepage')} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#f1787e" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Adoption Application</Text>
+        <View style={{ width: 32 }} />
+      </View>
+      
+      <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
       
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Full Name *</Text>
@@ -278,22 +288,38 @@ export default function AdoptionForm() {
           {loading ? 'Submitting...' : 'Submit Application'}
         </Text>
       </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 25,
-    backgroundColor: '#fff',
-    minHeight: screenHeight,
+    flex: 1,
+    backgroundColor: '#f8f9fa',
   },
-  header: {
-    fontSize: 26,
-    color: '#d16d78',
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+    backgroundColor: '#fff',
+  },
+  backButton: {
+    padding: 8,
+  },
+  title: {
+    fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 30,
+    color: '#333',
+  },
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 25,
+    paddingTop: 20,
   },
   inputGroup: {
     marginBottom: 20,

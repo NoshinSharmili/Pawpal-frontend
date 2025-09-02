@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -36,6 +36,7 @@ const formatDate = (date: string | Date | null) => {
 
 export default function HealthTrackerScreen() {
   const { petId } = useLocalSearchParams();
+  const router = useRouter();
   const [health, setHealth] = useState<HealthRecord | null>(null);
   const [loading, setLoading] = useState(true);
   // Pet info state
@@ -210,8 +211,17 @@ export default function HealthTrackerScreen() {
   if (!health) return <Text style={{ textAlign: 'center', marginTop: 40 }}>No health record found.</Text>;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Health Tracker</Text>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/UserProfileScreen')} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#f1787e" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Health Tracker</Text>
+        <View style={{ width: 32 }} />
+      </View>
+      
+      <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
       {/* Pet Info Card (below title) */}
       {pet && (
         <View style={styles.petCardTop}>
@@ -445,23 +455,38 @@ export default function HealthTrackerScreen() {
           <Text style={styles.saveButtonText}>Save Vaccines</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    padding: 20,
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+    backgroundColor: '#fff',
+  },
+  backButton: {
+    padding: 8,
   },
   title: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#C74C58',
-    marginBottom: 18,
-    alignSelf: 'flex-start',
+    color: '#333',
+  },
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   card: {
     width: '100%',

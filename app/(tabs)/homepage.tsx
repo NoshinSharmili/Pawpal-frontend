@@ -1,6 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -60,27 +61,29 @@ export default function HomePage() {
     return age;
   }
 
-  useEffect(() => {
-    const fetchPets = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch('http://10.0.2.2:5000/api/pets/');
-        if (!response.ok) throw new Error('Failed to fetch pets');
-        const data = await response.json();
-        // Only include pets with adoptionStatus === 'up for adoption'
-        const upForAdoption = data.filter((pet: any) => (pet.adoptionStatus || pet.status) === 'up for adoption');
-        setPets(upForAdoption);
-        setFilteredPets(upForAdoption); // Initialize filtered pets with all pets
-      } catch (err) {
-        setPets([]);
-        setFilteredPets([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPets();
-    // console.log(pets); // Don't log pets here, as it's async
+  const fetchPets = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://10.0.2.2:5000/api/pets/');
+      if (!response.ok) throw new Error('Failed to fetch pets');
+      const data = await response.json();
+      // Only include pets with adoptionStatus === 'up for adoption'
+      const upForAdoption = data.filter((pet: any) => (pet.adoptionStatus || pet.status) === 'up for adoption');
+      setPets(upForAdoption);
+      setFilteredPets(upForAdoption); // Initialize filtered pets with all pets
+    } catch (err) {
+      setPets([]);
+      setFilteredPets([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPets();
+    }, [fetchPets])
+  );
 
   useEffect(() => {
     const fetchFosterProfile = async () => {

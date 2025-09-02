@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -72,17 +74,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+    backgroundColor: '#fff',
+  },
+  backButton: {
+    padding: 8,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
   },
   viewToggle: {
     flexDirection: 'row',
@@ -362,6 +365,7 @@ const VetMapView: React.FC<VetMapViewProps> = ({ vets, userLocation, navigation 
 
 //Main VetFinderScreen Component with proper typing
 const VetFinderScreen: React.FC<VetFinderScreenProps> = ({ navigation }) => {
+  const router = useRouter();
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [vets, setVets] = useState<Vet[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -411,6 +415,9 @@ const VetFinderScreen: React.FC<VetFinderScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.push('/homepage')} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#f1787e" />
+        </TouchableOpacity>
         <Text style={styles.title}>Find Veterinarians</Text>
         <View style={styles.viewToggle}>
           <TouchableOpacity 

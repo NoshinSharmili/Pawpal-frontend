@@ -156,7 +156,11 @@ const CommunityScreen = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Community</Text>
+        <TouchableOpacity onPress={() => router.push('/homepage')} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#f1787e" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Community</Text>
+        <View style={{ width: 32 }} />
       </View>
 
       {/* Post Form */}
@@ -207,18 +211,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#fff',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 20,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#fff',
   },
-  headerTitle: {
-    fontSize: 24,
+  backButton: {
+    padding: 8,
+  },
+  title: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#f1787e',
-    textAlign: 'center',
+    color: '#333',
   },
   formContainer: { 
     backgroundColor: '#fff',

@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
@@ -120,8 +121,17 @@ export default function CreatePetPage() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Add a Pet</Text>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => router.push('/homepage')} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#f1787e" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Add a Pet</Text>
+        <View style={{ width: 32 }} />
+      </View>
+      
+      <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
@@ -167,22 +177,41 @@ export default function CreatePetPage() {
       <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? 'Submitting...' : 'Submit Pet'}</Text>
       </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: screenHeight * 0.05,
-    backgroundColor: '#fff',
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+    backgroundColor: '#fff',
   },
-  header: {
-    fontSize: 22,
+  backButton: {
+    padding: 8,
+  },
+  title: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#d16d78',
-    marginBottom: 20,
+    color: '#333',
+  },
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    alignItems: 'center',
   },
   imagePicker: {
     width: 160,

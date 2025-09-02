@@ -55,8 +55,17 @@ export default function FosterFinderScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.header}>Find a Foster</Text>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => router.push('/homepage')} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#f1787e" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Find a Foster</Text>
+        <View style={{ width: 32 }} />
+      </View>
+      
+      <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
       {fosters.map(foster => (
         <TouchableOpacity
           key={foster._id}
@@ -76,24 +85,39 @@ export default function FosterFinderScreen() {
           </Text>
         </TouchableOpacity>
       ))}
-      <View style={{ height: 40 }} />
-    </ScrollView>
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+    backgroundColor: '#fff',
+  },
+  backButton: {
+    padding: 8,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  scrollContainer: {
+    flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: 16,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#f1787e',
-    marginTop: 32,
-    marginBottom: 20,
-    textAlign: 'center',
+    paddingTop: 20,
   },
   card: {
     backgroundColor: '#faf9ff',

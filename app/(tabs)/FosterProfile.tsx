@@ -109,7 +109,7 @@ export default function FosterProfile() {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.push('/homepage')} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#f1787e" />
         </TouchableOpacity>
         <Text style={styles.title}>Foster Profile</Text>

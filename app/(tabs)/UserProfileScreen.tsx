@@ -21,6 +21,7 @@ export default function UserProfileScreen() {
   const [user, setUser] = useState<UserData | null>(null);
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasFosterProfile, setHasFosterProfile] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,6 +37,9 @@ export default function UserProfileScreen() {
         if (!petsRes.ok) throw new Error('Failed to fetch pets');
         const petsData = await petsRes.json();
         setPets(petsData);
+        // Check for foster profile
+        const fosterRes = await fetch(`http://10.0.2.2:5000/api/fosters/user/${userId}`);
+        setHasFosterProfile(fosterRes.ok);
       } catch (err) {
         Alert.alert('Error', 'Failed to fetch user or pets data.');
       } finally {
@@ -82,16 +86,20 @@ export default function UserProfileScreen() {
       <TouchableOpacity style={styles.addButton} onPress={() => router.replace('/createpet')}>
         <Text style={styles.addButtonText}>Add New Pet</Text>
       </TouchableOpacity>
-      {/* Register as Foster Section */}
+      {/* Foster Section */}
       <View style={styles.fosterSection}>
-        <Text style={styles.fosterSectionTitle}>Want to help pets in need?</Text>
+        <Text style={styles.fosterSectionTitle}>
+          {hasFosterProfile ? 'Thank you for helping pets in need!' : 'Want to help pets in need?'}
+        </Text>
         <TouchableOpacity 
           style={[styles.button, styles.registerFosterButton]} 
           onPress={() => { 
-            router.push('/RegisterFoster'); 
+            router.push(hasFosterProfile ? '/FosterProfile' : '/RegisterFoster'); 
           }}
         >
-          <Text style={[styles.buttonText, styles.registerFosterText]}>Register as a Foster</Text>
+          <Text style={[styles.buttonText, styles.registerFosterText]}>
+            {hasFosterProfile ? 'View your foster profile' : 'Register as a Foster'}
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
