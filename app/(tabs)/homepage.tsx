@@ -40,7 +40,7 @@ interface Pet {
 }
 
 export default function HomePage() {
-  const { userId } = useUser();
+  const { userId, logout } = useUser();
   const [pets, setPets] = useState<Pet[]>([]);
   const [filteredPets, setFilteredPets] = useState<Pet[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -134,7 +134,7 @@ export default function HomePage() {
     setFilteredPets(pets);
   };
   
-  const handleDropdownOption = (option: string) => {
+  const handleDropdownOption = async (option: string) => {
     setShowDropdown(false);
     switch (option) {
       case 'profile':
@@ -152,6 +152,10 @@ export default function HomePage() {
         break;
       case 'community':
         router.push('/CommunityScreen');
+        break;
+      case 'logout':
+        await logout();
+        router.push('/');
         break;
       default:
         break;
@@ -220,11 +224,19 @@ export default function HomePage() {
                 <Text style={styles.dropdownText}>Notifications</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.dropdownItem, styles.lastDropdownItem]}
+                style={styles.dropdownItem}
                 onPress={() => handleDropdownOption('community')}
               >
                 <MaterialCommunityIcons name="account-group-outline" size={20} color="#f1787e" />
                 <Text style={styles.dropdownText}>Community</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.dropdownItem, styles.lastDropdownItem]}
+                onPress={() => handleDropdownOption('logout')}
+              >
+                <Ionicons name="log-out-outline" size={20} color="#f1787e" />
+                <Text style={styles.dropdownText}>Logout</Text>
               </TouchableOpacity>
             </View>
           )}
