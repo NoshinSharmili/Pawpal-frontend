@@ -73,6 +73,7 @@ export default function CreatePetPage() {
   };
 
   const handleSubmit = async () => {
+    setAdoptionStatus("personal");
     setCategoryError('');
     if (!type) {
       setCategoryError('Please select a pet category.');
@@ -163,16 +164,17 @@ export default function CreatePetPage() {
         <Text style={styles.switchLabel}>Vaccinated?</Text>
         <Switch value={vaccinationStatus} onValueChange={setVaccinationStatus} />
       </View>
-      <TextInput style={styles.input} placeholder="Feeding Status" value={feedingStatus} onChangeText={setFeedingStatus} />
-      <TextInput style={styles.input} placeholder="Adoption Status" value={adoptionStatus} onChangeText={setAdoptionStatus} />
+      {/* <TextInput style={styles.input} placeholder="Feeding Status" value={feedingStatus} onChangeText={setFeedingStatus} />
+      <TextInput style={styles.input} placeholder="Adoption Status" value={adoptionStatus} onChangeText={setAdoptionStatus} /> */}
+      
       <View style={styles.switchRow}>
         <Text style={styles.switchLabel}>Needs Vaccination?</Text>
         <Switch value={needVaccination} onValueChange={setNeedVaccination} />
       </View>
-      <View style={styles.switchRow}>
+      {/* <View style={styles.switchRow}>
         <Text style={styles.switchLabel}>Transferred Food?</Text>
         <Switch value={transferredFood} onValueChange={setTransferredFood} />
-      </View>
+      </View> */}
       <TextInput style={styles.input} placeholder="Location" value={location} onChangeText={setLocation} />
       <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? 'Submitting...' : 'Submit Pet'}</Text>
