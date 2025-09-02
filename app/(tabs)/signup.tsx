@@ -37,17 +37,9 @@ export default function SignUpPage() {
         } catch {}
         throw new Error(msg);
       }
-      // Now check session to get userId
-      const sessionRes = await fetch('http://10.0.2.2:5000/api/users/session', {
-        method: 'GET',
-        credentials: 'include',
-      });
-      if (!sessionRes.ok) throw new Error('Session check failed');
-      const sessionData = await sessionRes.json();
-      if (!sessionData.loggedIn || !sessionData.userId) throw new Error('No userId returned');
-      setUserId(sessionData.userId);
-      alert('Signup successful!');
-      router.back(); 
+      
+      alert('Signup successful! Please login with your new account.');
+      router.push('/login'); 
     } catch (err: any) {
       alert(err.message || 'Signup failed. Please try again.');
     } finally {
