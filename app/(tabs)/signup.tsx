@@ -2,31 +2,46 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useUser } from '../../context/UserContext';
 
 const screenHeight = Dimensions.get('window').height;
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { setUserId } = useUser();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
-    console.log("name, email, password");
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/users', {
+      const response = await fetch('http://10.0.2.2:5000/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email }),
+        credentials: 'include',
+        body: JSON.stringify({ name, email, password }),
       });
-      if (!response.ok) throw new Error('Signup failed');
-      // You can handle navigation or success feedback here
-      alert('Signup successful!');
-      // router.push('/login'); // Optionally navigate
-    } catch (err) {
-      alert('Signup failed. Please try again.');
+      if (!response.ok) {
+        let msg = 'Signup failed.';
+        try {
+          const errData = await response.json();
+          if (errData && errData.error && typeof errData.error === 'string') {
+            if (errData.error.includes('duplicate key') || errData.error.includes('email')) {
+              msg = 'An account with this email already exists.';
+            } else {
+              msg = errData.error;
+            }
+          }
+        } catch {}
+        throw new Error(msg);
+      }
+      
+      alert('Signup successful! Please login with your new account.');
+      router.push('/login'); 
+    } catch (err: any) {
+      alert(err.message || 'Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -34,6 +49,16 @@ export default function SignUpPage() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {/* Top Heading */}
+      <Text style={styles.welcomeText}>Create your account</Text>
+      {/* Top Logo */}
+      <View >
+        <Image
+          source={require('@/assets/images/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
       {/* Top Cat Image (No Welcome) */}
       <View style={styles.catTopWrapper}>
         <Image
@@ -114,16 +139,15 @@ const styles = StyleSheet.create({
   catImage: {
     width: 160,
     height: 160,
-    marginBottom: -screenHeight * 0.1, // pulls form up behind the cat
+    marginBottom: -screenHeight * 0.05, // pulls form up behind the cat
   },
   formCard: {
     backgroundColor: '#d16d78',
     width: '100%',
-    maxWidth: 400,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 25,
-    paddingTop: screenHeight * 0.12, // leaves space under the cat
+    paddingTop: screenHeight * 0.08, // leaves space under the cat
     paddingBottom: 40,
     alignItems: 'center',
     zIndex: 2,
@@ -183,6 +207,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textDecorationLine: 'underline',
     marginLeft: 4,
+  },
+  logo: {
+    width: 230,
+    height: 150,
+  },
+  welcomeText: {
+    fontSize: 14,
+    color: '#555',
+    marginTop: 80,
   },
 });
 

@@ -1,9 +1,20 @@
-import { View, Text, StyleSheet } from 'react-native';
+
+import { router } from 'expo-router';
+import { useEffect } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function ConfirmationScreen() {
+
+      useEffect(() => {
+        const timer = setTimeout(() => {
+          router.push('/homepage'); 
+        }, 2000); 
+
+        return () => clearTimeout(timer);
+      }, []);
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🎉 Thank You!</Text>
+      <Text style={styles.title}>Thank You!🎉 </Text>
       <Text style={styles.message}>
         Your adoption application has been submitted successfully.
       </Text>
