@@ -2,6 +2,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { API_BASE_URL } from '../../config/api';
 
 export default function PublicFosterProfileScreen() {
   const { fosterId } = useLocalSearchParams();
@@ -26,7 +27,7 @@ export default function PublicFosterProfileScreen() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://10.0.2.2:5000/api/fosters/${fosterId}`);
+      const res = await fetch(`${API_BASE_URL}/api/fosters/${fosterId}`);
       if (!res.ok) throw new Error('Failed to fetch profile');
       const data = await res.json();
       setProfile(data);

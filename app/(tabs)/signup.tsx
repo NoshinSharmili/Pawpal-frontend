@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../../context/UserContext';
+import { API_BASE_URL } from '../../config/api';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -17,7 +18,7 @@ export default function SignUpPage() {
   const handleSignUp = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/users', {
+      const response = await fetch(`${API_BASE_URL}/api/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -50,7 +51,7 @@ export default function SignUpPage() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       {/* Top Heading */}
-      <Text style={styles.welcomeText}>Create your account</Text>
+      <Text testID="signup-heading" style={styles.welcomeText}>Create your account</Text>
       {/* Top Logo */}
       <View >
         <Image
@@ -71,13 +72,15 @@ export default function SignUpPage() {
       {/* Form Card */}
       <View style={styles.formCard}>
         <View style={styles.titleRow}>
-          <Text style={styles.title}>Sign Up</Text>
+          <Text testID="signup-title" style={styles.title}>Sign Up</Text>
           <FontAwesome name="paw" size={20} color="#fff" style={{ marginLeft: 10 }} />
         </View>
 
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Name</Text>
           <TextInput
+            testID="signup-name-input"
+            accessibilityLabel="Name"
             style={styles.input}
             placeholder="Olivia Wilson"
             placeholderTextColor="#888"
@@ -89,6 +92,8 @@ export default function SignUpPage() {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Email</Text>
           <TextInput
+            testID="signup-email-input"
+            accessibilityLabel="Email"
             style={styles.input}
             placeholder="hello@reallygreatsite.com"
             placeholderTextColor="#888"
@@ -101,6 +106,8 @@ export default function SignUpPage() {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Password</Text>
           <TextInput
+            testID="signup-password-input"
+            accessibilityLabel="Password"
             style={styles.input}
             placeholder="••••••"
             placeholderTextColor="#888"
@@ -110,13 +117,25 @@ export default function SignUpPage() {
           />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading}>
-          <Text style={styles.buttonText}>{loading ? 'Signing Up...' : 'Next'}</Text>
+        <TouchableOpacity
+          testID="signup-submit-button"
+          accessibilityLabel="Next"
+          accessibilityRole="button"
+          style={styles.button}
+          onPress={handleSignUp}
+          disabled={loading}
+        >
+          <Text testID="signup-submit-text" style={styles.buttonText}>{loading ? 'Signing Up...' : 'Next'}</Text>
         </TouchableOpacity>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Already have an account?</Text>
-          <TouchableOpacity onPress={() => router.push('/login')}>
+          <TouchableOpacity
+            testID="signup-signin-link"
+            accessibilityLabel="Sign in"
+            accessibilityRole="button"
+            onPress={() => router.push('/login')}
+          >
             <Text style={styles.footerLink}> Sign in</Text>
           </TouchableOpacity>
         </View>

@@ -9,7 +9,7 @@ export default function LandingPage() {
   return (
     <View style={styles.container}>
       <View style={{height: 70}}></View>
-      <Text style={styles.welcomeText}>Welcome to</Text>
+      <Text testID="landing-welcome-text" style={styles.welcomeText}>Welcome to</Text>
       <Image
           source={require('@/assets/images/logo.png')}
           style={styles.imageLogo}
@@ -32,10 +32,22 @@ export default function LandingPage() {
       {/* Login/Sign Up Card */}
       <View style={styles.buttonContainer}>
       <View style={{height: 70}}></View>
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/login')}>
+        <TouchableOpacity
+          testID="landing-login-button"
+          accessibilityLabel="Login"
+          accessibilityRole="button"
+          style={styles.button}
+          onPress={() => router.push('/login')}
+        >
           <Text style={styles.buttonText}>Login </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/signup')}>
+        <TouchableOpacity
+          testID="landing-signup-button"
+          accessibilityLabel="Sign Up"
+          accessibilityRole="button"
+          style={styles.button}
+          onPress={() => router.push('/signup')}
+        >
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
       </View>

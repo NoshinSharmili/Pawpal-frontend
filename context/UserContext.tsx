@@ -1,4 +1,5 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { API_BASE_URL } from '../config/api';
 
 const UserContext = createContext<{
   userId: string | null;
@@ -17,7 +18,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const res = await fetch('http://10.0.2.2:5000/api/users/session', {
+        const res = await fetch(`${API_BASE_URL}/api/users/session`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -43,7 +44,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Logout: call server and clear userId
   const logout = async () => {
     try {
-      await fetch('http://10.0.2.2:5000/api/users/logout', {
+      await fetch(`${API_BASE_URL}/api/users/logout`, {
         method: 'POST',
         credentials: 'include',
       });

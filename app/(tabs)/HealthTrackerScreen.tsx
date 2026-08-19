@@ -3,6 +3,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { API_BASE_URL } from '../../config/api';
 
 interface Vaccine {
   name: string;
@@ -60,7 +61,7 @@ export default function HealthTrackerScreen() {
   useEffect(() => {
     const fetchPet = async () => {
       try {
-        const res = await fetch(`http://10.0.2.2:5000/api/pets/${petId}`);
+        const res = await fetch(`${API_BASE_URL}/api/pets/${petId}`);
         if (!res.ok) throw new Error('Failed to fetch pet');
         const data = await res.json();
         setPet(data);
@@ -77,7 +78,7 @@ export default function HealthTrackerScreen() {
       setLoading(true);
       try {
         // First, get health record id for this pet
-        const res = await fetch(`http://10.0.2.2:5000/api/health-records/pet/${petId}`);
+        const res = await fetch(`${API_BASE_URL}/api/health-records/pet/${petId}`);
         if (!res.ok) throw new Error('No health record found');
         const record = await res.json();
         setHealth(record);
@@ -102,7 +103,7 @@ export default function HealthTrackerScreen() {
   // PATCH helpers
   const patchField = async (field: string, value: any) => {
     if (!health) return;
-    let url = `http://10.0.2.2:5000/api/health-records/${health._id}/${field}`;
+    let url = `${API_BASE_URL}/api/health-records/${health._id}/${field}`;
     let body: any = {};
     body[field] = value;
     try {
@@ -140,7 +141,7 @@ export default function HealthTrackerScreen() {
     try {
       setLoading(true);
       // PATCH lastVetVisit
-      let res = await fetch(`http://10.0.2.2:5000/api/health-records/${health._id}/lastVetVisit`, {
+      let res = await fetch(`${API_BASE_URL}/api/health-records/${health._id}/lastVetVisit`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lastVetVisit: formatDate(pendingVetDate) }),
@@ -151,7 +152,7 @@ export default function HealthTrackerScreen() {
       setVetDate(new Date(updated.lastVetVisit));
       setPendingVetDate(new Date(updated.lastVetVisit));
       // PATCH vetVisitIntervalWeeks
-      res = await fetch(`http://10.0.2.2:5000/api/health-records/${health._id}/vetVisitIntervalWeeks`, {
+      res = await fetch(`${API_BASE_URL}/api/health-records/${health._id}/vetVisitIntervalWeeks`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vetVisitIntervalWeeks: Number(pendingVetInterval) }),

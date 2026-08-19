@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Dimensions, Image, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../../context/UserContext';
+import { API_BASE_URL } from '../../config/api';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -46,7 +47,7 @@ export default function CreatePetPage() {
       const { fileName, fileType } = getFileNameAndType(asset.uri);
       try {
         // 1. Get presigned URL
-        const presignRes = await fetch('http://10.0.2.2:5000/api/pets/presigned-url', {
+        const presignRes = await fetch(`${API_BASE_URL}/api/pets/presigned-url`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ fileName, fileType }),
@@ -106,7 +107,7 @@ export default function CreatePetPage() {
         location,
         image, // <-- add image URL
       };
-      const response = await fetch('http://10.0.2.2:5000/api/pets', {
+      const response = await fetch(`${API_BASE_URL}/api/pets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -125,24 +126,25 @@ export default function CreatePetPage() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.push('/homepage')} style={styles.backButton}>
+        <TouchableOpacity testID="create-pet-back-button" onPress={() => router.push('/homepage')} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#f1787e" />
         </TouchableOpacity>
-        <Text style={styles.title}>Add a Pet</Text>
+        <Text testID="create-pet-title" style={styles.title}>Add a Pet</Text>
         <View style={{ width: 32 }} />
       </View>
       
       <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-      <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+      <TouchableOpacity testID="create-pet-image-picker" style={styles.imagePicker} onPress={pickImage}>
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
         ) : (
           <Text style={styles.imagePickerText}>Upload Pet Photo</Text>
         )}
       </TouchableOpacity>
-      <TextInput style={styles.input} placeholder="Pet Name*" value={name} onChangeText={setName} />
+      <TextInput testID="create-pet-name-input" accessibilityLabel="Pet Name" style={styles.input} placeholder="Pet Name*" value={name} onChangeText={setName} />
       <View style = {styles.pickerContainer}>
         <Picker
+          testID="create-pet-category-picker"
           selectedValue={type}
           onValueChange={(itemValue: string) => setType(itemValue)}
         >
@@ -155,11 +157,11 @@ export default function CreatePetPage() {
         </Picker>
         </View>
       
-      {categoryError ? <Text style={{ color: 'red', marginBottom: 10 }}>{categoryError}</Text> : null}
-      <TextInput style={styles.input} placeholder="Breed" value={breed} onChangeText={setBreed} />
-      <TextInput style={styles.input} placeholder="Date of Birth (YYYY-MM-DD)" value={dob} onChangeText={setDob} />
+      {categoryError ? <Text testID="create-pet-category-error" style={{ color: 'red', marginBottom: 10 }}>{categoryError}</Text> : null}
+      <TextInput testID="create-pet-breed-input" accessibilityLabel="Breed" style={styles.input} placeholder="Breed" value={breed} onChangeText={setBreed} />
+      <TextInput testID="create-pet-dob-input" accessibilityLabel="Date of Birth" style={styles.input} placeholder="Date of Birth (YYYY-MM-DD)" value={dob} onChangeText={setDob} />
       
-      <TextInput style={styles.input} placeholder="Health Status" value={healthStatus} onChangeText={setHealthStatus} />
+      <TextInput testID="create-pet-health-input" accessibilityLabel="Health Status" style={styles.input} placeholder="Health Status" value={healthStatus} onChangeText={setHealthStatus} />
       <View style={styles.switchRow}>
         <Text style={styles.switchLabel}>Vaccinated?</Text>
         <Switch value={vaccinationStatus} onValueChange={setVaccinationStatus} />
@@ -175,8 +177,8 @@ export default function CreatePetPage() {
         <Text style={styles.switchLabel}>Transferred Food?</Text>
         <Switch value={transferredFood} onValueChange={setTransferredFood} />
       </View> */}
-      <TextInput style={styles.input} placeholder="Location" value={location} onChangeText={setLocation} />
-      <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+      <TextInput testID="create-pet-location-input" accessibilityLabel="Location" style={styles.input} placeholder="Location" value={location} onChangeText={setLocation} />
+      <TouchableOpacity testID="create-pet-submit-button" accessibilityLabel="Submit Pet" accessibilityRole="button" style={styles.button} onPress={handleSubmit} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? 'Submitting...' : 'Submit Pet'}</Text>
       </TouchableOpacity>
       </ScrollView>

@@ -3,9 +3,10 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, ListRenderItem, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../../context/UserContext';
+import { API_BASE_URL } from '../../config/api';
 
-const API_BASE = 'http://10.0.2.2:5000/api/posts';
-const COMMENT_API_BASE = 'http://10.0.2.2:5000/api/comments';
+const API_BASE = `${API_BASE_URL}/api/posts`;
+const COMMENT_API_BASE = `${API_BASE_URL}/api/comments`;
 
 interface Post {
   _id?: string;
@@ -82,7 +83,7 @@ export default function PostDetailScreen() {
     setCommentLoading(true);
     try {
       // First fetch the username using userId
-      const userRes = await fetch(`http://10.0.2.2:5000/api/users/${userId}`);
+      const userRes = await fetch(`${API_BASE_URL}/api/users/${userId}`);
       if (!userRes.ok) throw new Error('Failed to fetch user info');
       const userData = await userRes.json();
       const username = userData.name || 'Anonymous';

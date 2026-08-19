@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useUser } from '../../context/UserContext';
+import { API_BASE_URL } from '../../config/api';
 
 export default function RegisterFoster() {
   const [formData, setFormData] = useState<{
@@ -36,6 +37,7 @@ export default function RegisterFoster() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState('');
   const { userId } = useUser();
   const petTypes = ['Dogs', 'Cats', 'Rabbits', 'Birds', 'Others'];
   const availabilityStatusOptions = ['available', 'unavailable'];
@@ -59,27 +61,38 @@ export default function RegisterFoster() {
   };
 
   const validateForm = () => {
+    setFormError('');
     const required: FosterFormKey[] = ['fosterName', 'email', 'phone', 'address', 'capacity'];
     for (let field of required) {
       if (!formData[field] || (typeof formData[field] === 'string' && (formData[field] as string).trim() === '')) {
-        Alert.alert('Error', `Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+        const message = `Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`;
+        setFormError(message);
+        Alert.alert('Error', message);
         return false;
       }
     }
     if (formData.preferredPets.length === 0) {
-      Alert.alert('Error', 'Please select at least one preferred pet type');
+      const message = 'Please select at least one preferred pet type';
+      setFormError(message);
+      Alert.alert('Error', message);
       return false;
     }
     if (!formData.availabilityStatus) {
-      Alert.alert('Error', 'Please select your availability status');
+      const message = 'Please select your availability status';
+      setFormError(message);
+      Alert.alert('Error', message);
       return false;
     }
     if (isNaN(Number(formData.capacity)) || Number(formData.capacity) <= 0) {
-      Alert.alert('Error', 'Capacity must be a positive number');
+      const message = 'Capacity must be a positive number';
+      setFormError(message);
+      Alert.alert('Error', message);
       return false;
     }
     if (isNaN(Number(formData.totalPetsFosterd)) || Number(formData.totalPetsFosterd) < 0) {
-      Alert.alert('Error', 'Pets fostered must be 0 or a positive number');
+      const message = 'Pets fostered must be 0 or a positive number';
+      setFormError(message);
+      Alert.alert('Error', message);
       return false;
     }
     return true;
@@ -101,7 +114,7 @@ export default function RegisterFoster() {
         availabilityStatus: formData.availabilityStatus,
         details: formData.details,
       };
-      const response = await fetch('http://10.0.2.2:5000/api/fosters', {
+      const response = await fetch(`${API_BASE_URL}/api/fosters`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +149,7 @@ export default function RegisterFoster() {
         <TouchableOpacity onPress={() => router.push('/homepage')} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#f1787e" />
         </TouchableOpacity>
-        <Text style={styles.title}>Register as Foster</Text>
+        <Text testID="foster-register-title" style={styles.title}>Register as Foster</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -155,6 +168,8 @@ export default function RegisterFoster() {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Full Name *</Text>
           <TextInput
+            testID="foster-name-input"
+            accessibilityLabel="Full Name"
             style={styles.input}
             value={formData.fosterName}
             onChangeText={(value) => handleInputChange('fosterName', value)}
@@ -165,6 +180,8 @@ export default function RegisterFoster() {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Email Address *</Text>
           <TextInput
+            testID="foster-email-input"
+            accessibilityLabel="Email Address"
             style={styles.input}
             value={formData.email}
             onChangeText={(value) => handleInputChange('email', value)}
@@ -176,6 +193,8 @@ export default function RegisterFoster() {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Phone Number *</Text>
           <TextInput
+            testID="foster-phone-input"
+            accessibilityLabel="Phone Number"
             style={styles.input}
             value={formData.phone}
             onChangeText={(value) => handleInputChange('phone', value)}
@@ -191,6 +210,8 @@ export default function RegisterFoster() {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Street Address *</Text>
           <TextInput
+            testID="foster-address-input"
+            accessibilityLabel="Street Address"
             style={styles.input}
             value={formData.address}
             onChangeText={(value) => handleInputChange('address', value)}
@@ -208,6 +229,7 @@ export default function RegisterFoster() {
             {petTypes.map((petType) => (
               <TouchableOpacity
                 key={petType}
+                testID={`foster-pet-type-${petType.toLowerCase()}`}
                 style={[
                   styles.petTypeButton,
                   formData.preferredPets.includes(petType) && styles.petTypeButtonSelected
@@ -227,6 +249,8 @@ export default function RegisterFoster() {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Capacity (Maximum number of pets you can foster) *</Text>
           <TextInput
+            testID="foster-capacity-input"
+            accessibilityLabel="Capacity"
             style={styles.input}
             value={formData.capacity}
             onChangeText={(value) => handleInputChange('capacity', value)}
@@ -290,7 +314,15 @@ export default function RegisterFoster() {
       </View>
 
       {/* Submit Button */}
+      {formError ? (
+        <Text testID="foster-form-error" style={{ color: '#d9534f', textAlign: 'center', marginBottom: 12, paddingHorizontal: 20 }}>
+          {formError}
+        </Text>
+      ) : null}
       <TouchableOpacity
+        testID="foster-submit-button"
+        accessibilityLabel="Submit Application"
+        accessibilityRole="button"
         style={[styles.submitButton, loading && styles.submitButtonDisabled]}
         onPress={handleSubmit}
         disabled={loading}

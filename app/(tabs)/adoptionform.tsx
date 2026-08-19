@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { API_BASE_URL } from '../../config/api';
 const screenHeight = Dimensions.get('window').height;
 
 interface FormErrors {
@@ -113,7 +114,7 @@ export default function AdoptionForm() {
 
     setLoading(true);
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/adoption-applications/', {
+      const response = await fetch(`${API_BASE_URL}/api/adoption-applications/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { API_BASE_URL } from '../../config/api';
 
 interface AdoptionApplication {
   _id: string;
@@ -22,7 +23,7 @@ export default function AdoptionApplicationDetail() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetch(`http://10.0.2.2:5000/api/adoption-applications/${id}`)
+    fetch(`${API_BASE_URL}/api/adoption-applications/${id}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch application');
         return res.json();
@@ -42,7 +43,7 @@ export default function AdoptionApplicationDetail() {
     if (!id) return;
     setActionLoading(status);
     try {
-      const res = await fetch(`http://10.0.2.2:5000/api/adoption-applications/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/adoption-applications/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

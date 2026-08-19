@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../../context/UserContext';
+import { API_BASE_URL } from '../../config/api';
 
 
 interface Pet {
@@ -28,17 +29,17 @@ export default function UserProfileScreen() {
       setLoading(true);
       try {
         // Fetch user info
-        const userRes = await fetch(`http://10.0.2.2:5000/api/users/${userId}`);
+        const userRes = await fetch(`${API_BASE_URL}/api/users/${userId}`);
         if (!userRes.ok) throw new Error('Failed to fetch user');
         const userData = await userRes.json();
         setUser(userData);
         // Fetch pets
-        const petsRes = await fetch(`http://10.0.2.2:5000/api/pets/user/${userId}`);
+        const petsRes = await fetch(`${API_BASE_URL}/api/pets/user/${userId}`);
         if (!petsRes.ok) throw new Error('Failed to fetch pets');
         const petsData = await petsRes.json();
         setPets(petsData);
         // Check for foster profile
-        const fosterRes = await fetch(`http://10.0.2.2:5000/api/fosters/user/${userId}`);
+        const fosterRes = await fetch(`${API_BASE_URL}/api/fosters/user/${userId}`);
         setHasFosterProfile(fosterRes.ok);
       } catch (err) {
         Alert.alert('Error', 'Failed to fetch user or pets data.');

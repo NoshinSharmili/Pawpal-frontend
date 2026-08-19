@@ -11,6 +11,7 @@ import {
   View
 } from 'react-native';
 import { useUser } from '../../context/UserContext';
+import { API_BASE_URL } from '../../config/api';
 
 export default function FosterProfile() {
   const { userId } = useUser();
@@ -38,7 +39,7 @@ export default function FosterProfile() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://10.0.2.2:5000/api/fosters/user/${userId}`);
+      const res = await fetch(`${API_BASE_URL}/api/fosters/user/${userId}`);
       if (!res.ok) throw new Error('Failed to fetch profile');
       const data = await res.json();
       setProfile(data);
@@ -55,7 +56,7 @@ export default function FosterProfile() {
     const prev = profile.currentNumberOfFosterPets;
     setProfile({ ...profile, currentNumberOfFosterPets: newCount });
     try {
-      const res = await fetch(`http://10.0.2.2:5000/api/fosters/${profile._id}/currentNumberOfFosterPets`, {
+      const res = await fetch(`${API_BASE_URL}/api/fosters/${profile._id}/currentNumberOfFosterPets`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentNumberOfFosterPets: newCount })
@@ -75,7 +76,7 @@ export default function FosterProfile() {
     const prev = profile.availabilityStatus;
     setProfile({ ...profile, availabilityStatus: newStatus });
     try {
-      const res = await fetch(`http://10.0.2.2:5000/api/fosters/${profile._id}/availability`, {
+      const res = await fetch(`${API_BASE_URL}/api/fosters/${profile._id}/availability`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ availabilityStatus: newStatus })

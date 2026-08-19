@@ -11,6 +11,7 @@ import {
   View
 } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { API_BASE_URL } from '../../config/api';
 
 // Type definitions
 interface VetLocation {
@@ -376,7 +377,7 @@ const VetFinderScreen: React.FC<VetFinderScreenProps> = ({ navigation }) => {
     // Simulate user location (replace with real geolocation if available)
     setUserLocation({ latitude: 23.7805, longitude: 90.4125 });
     // Fetch vets from API
-    fetch('http://10.0.2.2:5000/api/vets')
+    fetch(`${API_BASE_URL}/api/vets`)
       .then((response) => response.json())
       .then((data) => {
         // Map API data to Vet[]
@@ -418,7 +419,7 @@ const VetFinderScreen: React.FC<VetFinderScreenProps> = ({ navigation }) => {
         <TouchableOpacity onPress={() => router.push('/homepage')} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#f1787e" />
         </TouchableOpacity>
-        <Text style={styles.title}>Find Veterinarians</Text>
+        <Text testID="vet-finder-title" style={styles.title}>Find Veterinarians</Text>
         <View style={styles.viewToggle}>
           <TouchableOpacity 
             style={[styles.toggleButton, viewMode === 'list' && styles.activeToggle]}

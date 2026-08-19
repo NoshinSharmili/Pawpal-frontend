@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { useUser } from '../../context/UserContext';
+import { API_BASE_URL } from '../../config/api';
 
 const categories = [
   { id: 'all', label: 'All', icon: require('@/assets/images/all.png') },
@@ -64,7 +65,7 @@ export default function HomePage() {
   const fetchPets = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/pets/');
+      const response = await fetch(`${API_BASE_URL}/api/pets/`);
       if (!response.ok) throw new Error('Failed to fetch pets');
       const data = await response.json();
       // Only include pets with adoptionStatus === 'up for adoption'
@@ -89,7 +90,7 @@ export default function HomePage() {
     const fetchFosterProfile = async () => {
       if (!userId) return;
       try {
-        const res = await fetch(`http://10.0.2.2:5000/api/fosters/user/${userId}`);
+        const res = await fetch(`${API_BASE_URL}/api/fosters/user/${userId}`);
         setHasFosterProfile(res.ok);
       } catch {
         setHasFosterProfile(false);
@@ -248,6 +249,8 @@ export default function HomePage() {
       {/* Search */}
       <View style={styles.searchBox}>
         <TextInput
+          testID="homepage-search-input"
+          accessibilityLabel="Search for pets"
           placeholder="Search for pets by name, breed, color..."
           placeholderTextColor="#aaa"
           style={styles.searchInput}
@@ -273,6 +276,9 @@ export default function HomePage() {
           <Text style={styles.bannerText}>Is your pet{"\n"}okay?</Text>
         </View>
         <TouchableOpacity 
+          testID="homepage-seek-help-button"
+          accessibilityLabel="Seek Help"
+          accessibilityRole="button"
           style={styles.seekHelpButton}
           onPress={() => {
             router.push('/VetFinderScreen');
@@ -289,6 +295,9 @@ export default function HomePage() {
           <Text style={styles.bannerText}>Looking for a {"\n"}foster home?</Text>
         </View>
         <TouchableOpacity
+          testID="homepage-see-fosters-button"
+          accessibilityLabel="See Fosters"
+          accessibilityRole="button"
           style={styles.seekHelpButton}
           onPress={() => {
             router.push('/FosterFinderScreen');
@@ -300,7 +309,7 @@ export default function HomePage() {
 
       {/* Categories */}
       <View style={styles.categoryHeader}>
-        <Text style={styles.sectionTitle}>Categories</Text>
+        <Text testID="homepage-categories-title" style={styles.sectionTitle}>Categories</Text>
         <TouchableOpacity>
           <Text style={styles.sectionLink}>Show All</Text>
         </TouchableOpacity>
@@ -310,6 +319,9 @@ export default function HomePage() {
         {categories.map((item) => (
           <TouchableOpacity
             key={item.id}
+            testID={`homepage-category-${item.id}`}
+            accessibilityLabel={item.label}
+            accessibilityRole="button"
             style={[styles.categoryItem, selectedCategory === item.id && styles.selectedCategoryItem]}
             onPress={() => setSelectedCategory(item.id)}
           >
@@ -325,7 +337,7 @@ export default function HomePage() {
       ) : filteredPets.length === 0 ? (
         <View style={styles.noResultsContainer}>
           <MaterialCommunityIcons name="magnify" size={48} color="#ccc" />
-          <Text style={styles.noResultsText}>
+          <Text testID="homepage-no-pets" style={styles.noResultsText}>
             {searchQuery ? `No pets found for "${searchQuery}"` : 'No pets available'}
           </Text>
           {searchQuery && (

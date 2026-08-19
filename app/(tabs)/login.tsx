@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../../context/UserContext';
+import { API_BASE_URL } from '../../config/api';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -15,7 +16,7 @@ export default function LoginPage() {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/users/login', {
+      const response = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -23,7 +24,7 @@ export default function LoginPage() {
       });
       if (!response.ok) throw new Error('Login failed');
       // Now check session to get userId
-      const sessionRes = await fetch('http://10.0.2.2:5000/api/users/session', {
+      const sessionRes = await fetch(`${API_BASE_URL}/api/users/session`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -42,7 +43,7 @@ export default function LoginPage() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       {/* Top Heading */}
-      <Text style={styles.welcomeText}>Sign in to continue</Text>
+      <Text testID="login-heading" style={styles.welcomeText}>Sign in to continue</Text>
       {/* Logo */}
       <Image
         source={require('@/assets/images/logo.png')}
@@ -59,10 +60,12 @@ export default function LoginPage() {
       </View>
       {/* Login Form Card */}
       <View style={styles.formContainer}>
-        <Text style={styles.title}>Log in</Text>
+        <Text testID="login-title" style={styles.title}>Log in</Text>
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Email</Text>
           <TextInput
+            testID="login-email-input"
+            accessibilityLabel="Email"
             placeholder="hello@reallygreatsite.com"
             placeholderTextColor="#888"
             style={styles.input}
@@ -75,6 +78,8 @@ export default function LoginPage() {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Password</Text>
           <TextInput
+            testID="login-password-input"
+            accessibilityLabel="Password"
             placeholder="••••••"
             placeholderTextColor="#888"
             style={styles.input}
@@ -84,15 +89,27 @@ export default function LoginPage() {
             autoCapitalize="none"
           />
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-          <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+        <TouchableOpacity
+          testID="login-submit-button"
+          accessibilityLabel="Login"
+          accessibilityRole="button"
+          style={styles.button}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          <Text testID="login-submit-text" style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity testID="login-forgot-password" accessibilityRole="button">
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', marginTop: 18, justifyContent: 'center' }}>
           <Text style={{ color: '#fff', fontSize: 13 }}>Don't have an account?</Text>
-          <TouchableOpacity onPress={() => router.push('/signup')}>
+          <TouchableOpacity
+            testID="login-signup-link"
+            accessibilityLabel="Sign up"
+            accessibilityRole="button"
+            onPress={() => router.push('/signup')}
+          >
             <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600', textDecorationLine: 'underline', marginLeft: 4 }}>Sign up!</Text>
           </TouchableOpacity>
         </View>

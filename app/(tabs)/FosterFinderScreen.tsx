@@ -2,6 +2,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { API_BASE_URL } from '../../config/api';
 
 interface Foster {
   _id: string;
@@ -23,7 +24,7 @@ export default function FosterFinderScreen() {
   const fetchFosters = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://10.0.2.2:5000/api/fosters');
+      const res = await fetch(`${API_BASE_URL}/api/fosters`);
       if (!res.ok) throw new Error('Failed to fetch fosters');
       const data = await res.json();
       setFosters(data);
@@ -38,43 +39,53 @@ export default function FosterFinderScreen() {
     router.push({ pathname: '/(tabs)/PublicFosterProfileScreen', params: { fosterId } });
   };
 
+  const header = (
+    <View style={styles.headerContainer}>
+      <TouchableOpacity testID="foster-finder-back-button" onPress={() => router.push('/homepage')} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={24} color="#f1787e" />
+      </TouchableOpacity>
+      <Text testID="foster-finder-title" style={styles.title}>Find a Foster</Text>
+      <View style={{ width: 32 }} />
+    </View>
+  );
+
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#f1787e" />
+      <View style={styles.container}>
+        {header}
+        <View style={styles.centered}>
+          <ActivityIndicator testID="foster-finder-loading" size="large" color="#f1787e" />
+        </View>
       </View>
     );
   }
 
   if (!fosters.length) {
     return (
-      <View style={styles.centered}>
-        <Text>No fosters found.</Text>
+      <View style={styles.container}>
+        {header}
+        <View style={styles.centered}>
+          <Text testID="foster-finder-empty">No fosters found.</Text>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.push('/homepage')} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#f1787e" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Find a Foster</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      {header}
       
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
       {fosters.map(foster => (
         <TouchableOpacity
           key={foster._id}
+          testID={`foster-card-${foster._id}`}
           style={styles.card}
           onPress={() => handleCardPress(foster._id)}
         >
           <View style={styles.cardHeader}>
             <MaterialCommunityIcons name="home-heart" size={28} color="#f1787e" style={{ marginRight: 12 }} />
-            <Text style={styles.fosterName}>{foster.fosterName}</Text>
+            <Text testID={`foster-name-${foster._id}`} style={styles.fosterName}>{foster.fosterName}</Text>
           </View>
           {foster.details ? (
             <Text style={styles.details}>{foster.details}</Text>

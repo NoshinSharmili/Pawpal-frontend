@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../../context/UserContext';
+import { API_BASE_URL } from '../../config/api';
 
 
 interface AdoptionApplication {
@@ -25,13 +26,13 @@ export default function NotificationsPage() {
     if (!userId) return;
     setLoading(true);
     Promise.all([
-      fetch(`http://10.0.2.2:5000/api/adoption-applications/user/${userId}`)
+      fetch(`${API_BASE_URL}/api/adoption-applications/user/${userId}`)
         .then(res => {
           if (!res.ok) throw new Error('Failed to fetch adoption applications');
           return res.json();
         })
         .catch(() => []),
-      fetch(`http://10.0.2.2:5000/api/adoption-applications/applicant/${userId}`)
+      fetch(`${API_BASE_URL}/api/adoption-applications/applicant/${userId}`)
         .then(res => {
           if (!res.ok) throw new Error('Failed to fetch your applications');
           return res.json();
